@@ -1,25 +1,69 @@
-自定义系统右键菜单工具-使用说明
+﻿自定义系统右键菜单工具-使用说明
+
+# 所需环境
+## .NET Framework v4.0
+下载地址：[Download Microsoft \.NET Framework 4（独立安装程序） from Official Microsoft Download Center](https://www.microsoft.com/zh-cn/download/confirmation.aspx?id=17718)
+
+## star库
+由于菜单响应事件是由py编写的，使用了三方的star库，所以需要安装一下，具体步骤：
+>在Python安装目录的lib文件夹下（如D:\Python27\Lib），直接gitclone地址：https://github.com/pythonstar/star.git
 
 # 安装
-执行reg.bat即可注册，注册原理见其源码：
+务必**以管理员身份运行**reg.bat进行注册，注册原理见其源码：
 
 ```
+@echo off
+
 set dir=%~dp0
 
-%dir%RegAsm.exe %dir%bin/CustomContextMenu.dll /CodeBase
+rem 判断64位系统和32位系统
+if /i %PROCESSOR_IDENTIFIER:~0,3%==x86 (
+    echo 32位操作系统
+    %windir%\Microsoft.NET\Framework\v4.0.30319\RegAsm.exe %dir%bin/CustomContextMenu.dll /CodeBase
+) else (
+    echo 64位操作系统
+    %windir%\Microsoft.NET\Framework64\v4.0.30319\RegAsm.exe %dir%bin/CustomContextMenu.dll /CodeBase
+)
+pause
 ```
-其中RegAsm.exe是在C:\Windows\Microsoft.NET\Framework64\v4.0.30319中复制的一份。
+输出含有以下内容时为注册成功：
+
+```
+Types registered successfully
+```
+或
+```
+成功注册了类型
+```
 
 # 卸载
-执行unreg.bat即可卸载，卸载原理见其源码：
+务必**以管理员身份运行**unreg.bat进行卸载，卸载原理见其源码：
 ```
+@echo off
+
 set dir=%~dp0
 
-%dir%RegAsm.exe /unregister %dir%bin/CustomContextMenu.dll /CodeBase
+rem 判断64位系统和32位系统
+if /i %PROCESSOR_IDENTIFIER:~0,3%==x86 (
+    echo 32位操作系统
+    %windir%\Microsoft.NET\Framework\v4.0.30319\RegAsm.exe /unregister %dir%bin/CustomContextMenu.dll /CodeBase
+) else (
+    echo 64位操作系统
+    %windir%\Microsoft.NET\Framework64\v4.0.30319\RegAsm.exe /unregister %dir%bin/CustomContextMenu.dll /CodeBase
+)
 
 taskkill /f /im explorer.exe
 
 explorer.exe
+```
+输出含有以下内容时为卸载成功：
+
+```
+Types un-registered successfully
+```
+或
+```
+成功注销了类型
 ```
 由于是重启了explorer.exe，所以卸载后dll文件可以操作。
 
