@@ -259,7 +259,7 @@ if __name__=='__main__':
     checkThirdParty()
     try:
         if DEBUG:
-            ret = main([__file__, 'sign', 'C:/Users/hzzhuxingxing/Desktop/test.apk'])
+            ret = main([__file__, 'sign', 'C:/Users/xxx/Desktop/test.apk'])
 
         else:
             ret = main(sys.argv)
