@@ -23,6 +23,10 @@ explorer.exe
 ```
 由于是重启了explorer.exe，所以卸载后dll文件可以操作。
 
+# 安装star库
+由于菜单响应事件是由py编写的，使用了三方的star库，所以需要安装一下，具体步骤：
+>在Python安装目录的lib文件夹下（如D:\Python27\Lib），直接gitclone地址：https://github.com/pythonstar/star.git
+
 # 自定义菜单配置
 ## 菜单配置文件
 在bin目录下修改menu.xml，默认给出了一个模板：
