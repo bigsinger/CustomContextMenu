@@ -4,8 +4,11 @@
 ## .NET Framework v4.0
 下载地址：[Download Microsoft \.NET Framework 4（独立安装程序） from Official Microsoft Download Center](https://www.microsoft.com/zh-cn/download/confirmation.aspx?id=17718)
 
+## Python2.7
+由于菜单响应事件是由py编写的，所以需要安装Python，选择的版本是2.7，下载地址：[Python 2\.7\.0 Release \| Python\.org](https://www.python.org/download/releases/2.7/)
+
 ## star库
-由于菜单响应事件是由py编写的，使用了三方的star库，所以需要安装一下，具体步骤：
+由于菜单响应事件是由py编写的，且使用了三方的star库，所以需要安装一下，具体步骤：
 >在Python安装目录的lib文件夹下（如D:\Python27\Lib），直接gitclone地址：https://github.com/pythonstar/star.git
 
 # 安装
@@ -66,10 +69,6 @@ Types un-registered successfully
 成功注销了类型
 ```
 由于是重启了explorer.exe，所以卸载后dll文件可以操作。
-
-# 安装star库
-由于菜单响应事件是由py编写的，使用了三方的star库，所以需要安装一下，具体步骤：
->在Python安装目录的lib文件夹下（如D:\Python27\Lib），直接gitclone地址：https://github.com/pythonstar/star.git
 
 # 自定义菜单配置
 ## 菜单配置文件
