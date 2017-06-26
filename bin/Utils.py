@@ -15,56 +15,6 @@ def getthispath():
     elif os.path.isfile(path):
         return os.path.split(path)[0] + os.sep
 
-def runcmd(adb_cmd):
-    """
-    Format adb command and execute it in shell
-    :param adb_cmd: list adb command to execute
-    :return: string '0' and shell command output if successful, otherwise
-    raise CalledProcessError exception and return error code
-    """
-    t = tempfile.TemporaryFile()
-    final_adb_cmd = []
-    for e in adb_cmd:
-        if e != '':  # avoid items with empty string...
-            final_adb_cmd.append(e)  # ... so that final command doesn't
-            # contain extra spaces
-    print('\n*** Executing ' + ' '.join(adb_cmd))
-
-    try:
-        output = check_output(final_adb_cmd, stderr=t)
-    except CalledProcessError as e:
-        t.seek(0)
-        result = e.returncode, t.read()
-        print result
-    else:
-        result = 0, output
-        # print('\n' + result[1])
-
-    return result
-
-def run_cmd_asyn(adb_cmd):
-    """
-    Format adb command and execute it in shell
-    :param adb_cmd: list adb command to execute
-    :return: string '0' and shell command output if successful, otherwise
-    raise CalledProcessError exception and return error code
-    """
-    final_adb_cmd = []
-    for e in adb_cmd:
-        if e != '':  # avoid items with empty string...
-            final_adb_cmd.append(e)  # ... so that final command doesn't
-            # contain extra spaces
-    print('\n*** Executing ' + ' '.join(adb_cmd) + ' ' + 'command')
-
-    try:
-        p = subprocess.Popen(final_adb_cmd, stdout=subprocess.PIPE, shell=False)
-        # s = p.stdout.read()
-        # p.stdout.close()
-        # retval = p.wait()
-        # return retval,s
-    except CalledProcessError as e:
-        pass
-
 def get_file_ext(path):
     print os.path.splitext(path)
     # return os.path.splitext(path)[1]
