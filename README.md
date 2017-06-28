@@ -9,7 +9,7 @@
 
 ## star库
 由于菜单响应事件是由py编写的，且使用了三方的star库，所以需要安装一下，具体步骤：
->在Python安装目录的lib文件夹下（如D:\Python27\Lib），直接gitclone地址：https://github.com/pythonstar/star.git
+>在Python安装目录的lib文件夹下（如D:\Python27\Lib），直接gitclone地址：https://github.com/bigsinger/star
 
 # 安装
 务必**以管理员身份运行**reg.bat进行注册，注册原理见其源码：
