@@ -59,5 +59,10 @@ class PathManager:
         return u'F:/360云盘/Tools/luaEditor/LuaEditor.exe'
 
     @staticmethod
+    def get_mdconverter_path():
+        tool = os.path.join(Utils.getthispath(), 'tools\\md\\mdconverter.py')
+        return tool
+
+    @staticmethod
     def get_about_path():
         return os.path.join(Utils.getthispath(), 'tools\\about.exe')

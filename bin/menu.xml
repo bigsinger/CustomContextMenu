@@ -25,8 +25,8 @@
   <menu name="反编译" icon="icon\decom.png" tag="baksmali"/>
   <menu name="回编译" icon="icon\build.png" tag="smali"/>
   <menu name="自定义插件" icon="icon\plug.png">
-    <menu name="插件1" tag="plug1"/>
-    <menu name="插件2" tag="plug2"/>
+    <menu name="MD转换HTML" tag="md2html"/>
+    <menu name="MD转换PDF" tag="md2pdf"/>
     <menu name="插件3" tag="plug3"/>
   </menu>
   <menu name="关于 v3.0" icon="icon\about.png" tag="about"/>

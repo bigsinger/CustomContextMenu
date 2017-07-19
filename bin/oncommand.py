@@ -90,10 +90,10 @@ def on_command(params):
     elif CMD_STR == 'smali':
         print u'smali'
         ret, msg = smali(filesSelected)
-    elif CMD_STR == 'plug1':
-        ret, msg = plug(filesSelected)
-    elif CMD_STR == 'plug2':
-        ret, msg = plug(filesSelected)
+    elif CMD_STR == 'md2html':
+        ret, msg = md2html(filesSelected)
+    elif CMD_STR == 'md2pdf':
+        ret, msg = md2pdf(filesSelected)
     elif CMD_STR == 'plug3':
         ret, msg = plug(filesSelected)
     elif CMD_STR == 'about':
@@ -306,6 +306,12 @@ def baksmali(f):
 # 回编译
 def smali(f):
     return star.runcmd2([PathManager.get_apktool_path(), 'b', f])
+
+def md2html(f):
+    return star.runcmd2([PathManager.get_mdconverter_path(), f])
+
+def md2pdf(f):
+    return star.runcmd2([PathManager.get_mdconverter_path(), f, 'pdf'])
 
 def plug(f):
     print u'等你来写。。。'
