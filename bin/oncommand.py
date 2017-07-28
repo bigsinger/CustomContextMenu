@@ -15,12 +15,9 @@ import logging
 import traceback
 import re
 import ZipManager
-from ApkDetect import ApkDetect
-import win32con
-import win32clipboard
+import pyperclip
 from PIL import Image
 from cStringIO import StringIO
-import NEProtectVerManager
 
 try:
     import star
@@ -30,11 +27,13 @@ try:
     from PathManager import *
     from Constant import Constant
     from xml.dom import minidom
+    import NEProtectVerManager
+    from ApkDetect import ApkDetect
 except Exception as e:
     print traceback.format_exc()
     os.system('pause')
 
-DEBUG = True
+DEBUG = False
 
 '''
 params: [0]oncommand.py [1]command  [2]filepath [files]
@@ -59,6 +58,7 @@ def on_command(params):
         print params[1]
         return -1, u'参数不对，需要传至少 3 个参数'
     CMD_STR = params[1]
+    os.system('pause')
     filesSelected = params[2]
     if paramCount > 3:
         isMultiFiles = True
@@ -417,10 +417,7 @@ def photo(file_path):
     image.convert("RGB").save(output, "BMP")
     data = output.getvalue()[14:]
     output.close()
-    win32clipboard.OpenClipboard()
-    win32clipboard.EmptyClipboard()
-    win32clipboard.SetClipboardData(win32con.CF_DIB, data)
-    win32clipboard.CloseClipboard()
+    pyperclip.copy(data)
     print '图片已经复制到了剪贴板，您可直接粘贴使用'
     return 0, None
 
@@ -479,14 +476,13 @@ def checkThirdParty():
     #     print traceback.format_exc()
     pass
 
-
 if __name__ == '__main__':
     ret = 0
     msg = None
     checkThirdParty()
     try:
         if DEBUG:
-            ret, msg = on_command([__file__, 'dex2jar', 'C:\Users\hzhuqi\Desktop\\jartest\\boss.apk'])
+            ret, msg = on_command([__file__, 'dex2jar', os.path.join(Utils.get_desktop_path(), 'jartest\\boss.apk')])
         else:
             ret, msg = on_command(sys.argv)
         if ret != 0 and ret is not None:

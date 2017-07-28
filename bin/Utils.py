@@ -3,6 +3,7 @@
 import os
 import sys
 import tempfile
+import _winreg
 from subprocess import check_output, CalledProcessError
 import subprocess
 import ConfigParser
@@ -67,3 +68,8 @@ def get_value_from_confing(node_name, item_name):
     with open(PathManager.get_config_file_path(), 'r') as config_file:
         config.readfp(config_file)
         return config.get(node_name, item_name)
+
+# 返回桌面全路径，末尾不带\
+def get_desktop_path():
+    key = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, r'Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders',)
+    return _winreg.QueryValueEx(key, "Desktop")[0]
