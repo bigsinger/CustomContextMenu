@@ -99,8 +99,10 @@ def on_command(params):
         ret, msg = smali(filesSelected)
     elif CMD_STR == 'plug_get_neprotect_ver':
         ret, msg = plug_get_neprotect_ver(filesSelected)
-    elif CMD_STR == 'plug2':
-        ret, msg = plug(filesSelected)
+    elif CMD_STR == 'md2html':
+        ret, msg = md2html(filesSelected)
+    elif CMD_STR == 'md2pdf':
+        ret, msg = md2pdf(filesSelected)
     elif CMD_STR == 'plug3':
         ret, msg = plug(filesSelected)
     elif CMD_STR == 'about':
@@ -457,6 +459,11 @@ def baksmali(f):
 def smali(f):
     return star.runcmd2([PathManager.get_apktool_path(), 'b', f])
 
+def md2html(f):
+    return star.runcmd2([PathManager.get_mdconverter_path(), f])
+
+def md2pdf(f):
+    return star.runcmd2([PathManager.get_mdconverter_path(), f, 'pdf'])
 
 def plug(f):
     os.system('pause')
@@ -479,7 +486,7 @@ if __name__ == '__main__':
     checkThirdParty()
     try:
         if DEBUG:
-            ret, msg = on_command([__file__, 'icon', 'C:\Users\hzhuqi\Desktop\\jartest\\boss.apk'])
+            ret, msg = on_command([__file__, 'dex2jar', 'C:\Users\hzhuqi\Desktop\\jartest\\boss.apk'])
         else:
             ret, msg = on_command(sys.argv)
         if ret != 0 and ret is not None:

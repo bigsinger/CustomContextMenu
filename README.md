@@ -1,4 +1,4 @@
-﻿自定义系统右键菜单工具-使用说明
+自定义系统右键菜单工具-使用说明
 
 # 所需环境
 ## .NET Framework v4.0
@@ -9,7 +9,13 @@
 
 ## star库
 由于菜单响应事件是由py编写的，且使用了三方的star库，所以需要安装一下，具体步骤：
->在Python安装目录的lib文件夹下（如D:\Python27\Lib），直接gitclone地址：https://github.com/pythonstar/star.git
+>在Python安装目录的lib文件夹下（如D:\Python27\Lib），直接gitclone地址：https://github.com/bigsinger/star
+
+## pywin32    
+如果你的机器上未安装该模块，需要下载对应的版本安装，下载地址：[pywin32](https://sourceforge.net/projects/pywin32/files/pywin32/Build%20221/)
+安装版本需要对应你使用的python版本保持一致，否则安装后使用会出现dll load failed: 1% 不是有效的win32的错误，python版本主要是看版本号和python位数，在命令行输入python命令可以查看，如果python版本为2.7，32位，则下载pywin32时需要选择版本为2.7的32位，如果python版本为3.x的64位，则下载对应3.x版本的64位
+
+代码中可能会依赖很多三方库，如果运行脚本出现 ImportError: No module name xxx时可能是未安装xxx库，需要先安装，可在命令行执行pip install xxx（缺少的库的名称）即可  
 
 # 安装
 务必**以管理员身份运行**reg.bat进行注册，注册原理见其源码：

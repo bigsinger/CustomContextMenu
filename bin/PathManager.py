@@ -20,10 +20,6 @@ class PathManager:
         return os.path.join(Utils.getthispath(), 'tools\\dex2jar-2.0\\d2j-dex2jar.bat')
 
     @staticmethod
-    def get_zipaligin_tool_path():
-        return os.path.join(Utils.getthispath(), 'tools\\zipalign.exe')
-
-    @staticmethod
     def get_jdgui_path():
         return os.path.join(Utils.getthispath(), 'tools\\jdgui\\jd-gui.exe')
 
@@ -63,6 +59,11 @@ class PathManager:
         return u'F:/360云盘/Tools/luaEditor/LuaEditor.exe'
 
     @staticmethod
+    def get_mdconverter_path():
+        tool = os.path.join(Utils.getthispath(), 'tools\\md\\mdconverter.py')
+        return tool
+
+    @staticmethod
     def get_about_path():
         return os.path.join(Utils.getthispath(), 'tools\\about.exe')
 
@@ -76,6 +77,7 @@ class PathManager:
     @staticmethod
     def get_config_file_path():
         return os.path.join(Utils.getthispath(), 'tools\\config\\config.ini')
+
     @staticmethod
     def get_jad_path():
         return os.path.join(Utils.getthispath(), 'tools\\jad.exe')
