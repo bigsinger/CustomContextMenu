@@ -27,7 +27,6 @@ try:
     from PathManager import *
     from Constant import Constant
     from xml.dom import minidom
-    import NEProtectVerManager
     from ApkDetect import ApkDetect
 except Exception as e:
     print traceback.format_exc()
@@ -58,7 +57,6 @@ def on_command(params):
         print params[1]
         return -1, u'参数不对，需要传至少 3 个参数'
     CMD_STR = params[1]
-    os.system('pause')
     filesSelected = params[2]
     if paramCount > 3:
         isMultiFiles = True
@@ -133,7 +131,14 @@ def on_command(params):
 
 
 def plug_get_neprotect_ver(apk_path):
-    version = NEProtectVerManager.get_version(apk_path)
+    version = None
+    try:
+        import NEProtectVerManager
+        version = NEProtectVerManager.get_version(apk_path)
+    except Exception as e:
+        print traceback.format_exc()
+        os.system('pause')
+        return None, None
     if version:
         print u'当前apk使用的网易云加密的版本号为： ' + version
         return version, None
