@@ -1,12 +1,12 @@
-#coding:utf-8
+# coding:utf-8
 
 import os
 import sys
 import Utils
 from Constant import Constant
 
-class PathManager:
 
+class PathManager:
     @staticmethod
     def get_java_path():
         return "D:\\java\\jre7\\bin"
@@ -18,6 +18,10 @@ class PathManager:
     @staticmethod
     def get_dex2jar_path():
         return os.path.join(Utils.getthispath(), 'tools\\dex2jar-2.0\\d2j-dex2jar.bat')
+
+    @staticmethod
+    def get_zipaligin_tool_path():
+        return os.path.join(Utils.getthispath(), 'tools\\zipalign.exe')
 
     @staticmethod
     def get_jdgui_path():
@@ -59,10 +63,19 @@ class PathManager:
         return u'F:/360云盘/Tools/luaEditor/LuaEditor.exe'
 
     @staticmethod
-    def get_mdconverter_path():
-        tool = os.path.join(Utils.getthispath(), 'tools\\md\\mdconverter.py')
-        return tool
-
-    @staticmethod
     def get_about_path():
         return os.path.join(Utils.getthispath(), 'tools\\about.exe')
+
+    @staticmethod
+    def get_temp_dir_path():
+        temp_dir = os.path.join(Utils.getthispath(), 'temp')
+        if not os.path.exists(temp_dir):
+            os.mkdir(temp_dir)
+        return temp_dir
+
+    @staticmethod
+    def get_config_file_path():
+        return os.path.join(Utils.getthispath(), 'tools\\config\\config.ini')
+    @staticmethod
+    def get_jad_path():
+        return os.path.join(Utils.getthispath(), 'tools\\jad.exe')

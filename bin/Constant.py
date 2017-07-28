@@ -1,8 +1,9 @@
-#coding:utf-8
+# coding:utf-8
 class Constant:
     @staticmethod
     def test():
         pass
+
 
 Constant.NS_ANDROID_URI = 'http://schemas.android.com/apk/res/android'
 Constant.KEYTOOL_FILENAME = 'keytool.exe'
@@ -17,6 +18,11 @@ Constant.OK = 0
 Constant.SUCCESS = 0
 
 Constant.ERROR_MSG = {
-    Constant.OK:u"成功",
+    Constant.OK: u"成功",
     Constant.ERROR: u"失败",
 }
+
+Constant.FLASH = 'flash',  # 普通apk
+Constant.UNITY3D = 'unity3d',  # unity3d引擎游戏
+Constant.COCOS2DX = 'cocos2dx',  # cocos2dx引擎游戏
+Constant.NEOX = 'neox',  # neox引擎游戏
