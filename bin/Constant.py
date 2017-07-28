@@ -22,7 +22,7 @@ Constant.ERROR_MSG = {
     Constant.ERROR: u"失败",
 }
 
-Constant.FLASH = 'flash',  # 普通apk
+Constant.FLASH = 'flash',  # flash 
 Constant.UNITY3D = 'unity3d',  # unity3d引擎游戏
 Constant.COCOS2DX = 'cocos2dx',  # cocos2dx引擎游戏
 Constant.NEOX = 'neox',  # neox引擎游戏
