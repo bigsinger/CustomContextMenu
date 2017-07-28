@@ -1,7 +1,6 @@
 *.pyc
 
 bin/tools/jdgui/jd-gui.cfg
-
 bin/tools/sign/sign.db
 NEProtectVerManager.py
 NEProtectVerManager.pyc
