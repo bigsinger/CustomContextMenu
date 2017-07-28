@@ -5,3 +5,4 @@ bin/tools/sign/sign.db
 NEProtectVerManager.py
 NEProtectVerManager.pyc
 .idea
+/bin/temp
