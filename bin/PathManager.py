@@ -1,7 +1,6 @@
 # coding:utf-8
 
 import os
-import sys
 import Utils
 from Constant import Constant
 
@@ -81,3 +80,7 @@ class PathManager:
     @staticmethod
     def get_jad_path():
         return os.path.join(Utils.getthispath(), 'tools\\jad.exe')
+
+    @staticmethod
+    def get_zipaligin_tool_path():
+        return os.path.join(Utils.getthispath(), 'tools\\zipalign.exe')

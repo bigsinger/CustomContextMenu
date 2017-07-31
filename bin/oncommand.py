@@ -11,11 +11,11 @@ import os
 import sys
 import shutil
 import zipfile
-import logging
 import traceback
 import re
+import win32clipboard
+import win32con
 import ZipManager
-import pyperclip
 from PIL import Image
 from cStringIO import StringIO
 
@@ -87,16 +87,20 @@ def on_command(params):
         ret, msg = viewphone(filesSelected)
     elif CMD_STR == 'photo':
         ret, msg = photo(filesSelected)
+        os.system('pause')
     elif CMD_STR == 'icon':
         ret, msg = extracticon(filesSelected)
+        os.system('pause')
     elif CMD_STR == 'zipalign':
         ret, msg = zipalign(filesSelected)
+        os.system('pause')
     elif CMD_STR == 'baksmali':
         ret, msg = baksmali(filesSelected)
     elif CMD_STR == 'smali':
         ret, msg = smali(filesSelected)
     elif CMD_STR == 'plug_get_neprotect_ver':
         ret, msg = plug_get_neprotect_ver(filesSelected)
+        os.system('pause')
     elif CMD_STR == 'md2html':
         ret, msg = md2html(filesSelected)
     elif CMD_STR == 'md2pdf':
@@ -134,7 +138,7 @@ def plug_get_neprotect_ver(apk_path):
     version = None
     try:
         import NEProtectVerManager
-        version = NEProtectVerManager.get_version(apk_path)
+        version = NEProtectVerManager.get_version(apk_path,PathManager.get_aapt_path())
     except Exception as e:
         print traceback.format_exc()
         os.system('pause')
@@ -148,27 +152,23 @@ def plug_get_neprotect_ver(apk_path):
 
 # 支持APK、DEX转换为Jar，
 def dex2jar(f):
-    # 如果操作的是apk，则将apk中全部的dex文件解压到在apk同级目录下创建的dex目录下
+    # 如果操作的是apk，则将apk中全部的dex转换为jar文件输出到在apk同级目录下创建的jar目录下
     if f.endswith('.apk'):
-        dex_file_path = os.path.join(os.path.dirname(f), 'dex')
-        output_temp_dir = PathManager.get_temp_dir_path()
-        ZipManager.unzip_dexFile_to_dest(f, dex_file_path)
-        filenames = os.listdir(dex_file_path)
-        os.chdir(dex_file_path)
+        ouput_jar_path = os.path.join(os.path.dirname(f), 'jar')
+        temp_dex_dir = PathManager.get_temp_dir_path()
+        ZipManager.unzip_dexFile_to_dest(f, temp_dex_dir)
+        filenames = os.listdir(temp_dex_dir)
         for dex_name in filenames:
+            print dex_name
             if dex_name.endswith('.dex'):
+                dex_file_path = os.path.join(temp_dex_dir, dex_name)
                 jar_file = os.path.splitext(dex_name)[0]
-                retcode, msg = star.runcmd2([PathManager.get_dex2jar_path(), dex_name, '-f', '-o',
-                                             os.path.join(output_temp_dir, jar_file + '.jar')])
+                retcode, msg = star.runcmd2([PathManager.get_dex2jar_path(), dex_file_path, '-f', '-o',
+                                             os.path.join(ouput_jar_path, jar_file + '.jar')])
                 if retcode == 0:
-                    star.run_cmd_asyn([PathManager.get_jdgui_path(), os.path.join(output_temp_dir, jar_file + '.jar')])
+                    star.run_cmd_asyn([PathManager.get_jdgui_path(), os.path.join(ouput_jar_path, jar_file + '.jar')])
                     print 'dex2jar ok'
-        '''
-        filenames = os.listdir(output_temp_dir)
-        for jar in filenames:
-            star.run_cmd_asyn([PathManager.get_jdgui_path(), os.path.join(output_temp_dir, jar)])
-            print 'dex2jar ok'
-        '''
+        shutil.rmtree(temp_dex_dir)
         return retcode, msg
     elif f.endswith('.dex'):
         jarFile = os.path.splitext(f)[0] + '.jar'
@@ -247,7 +247,7 @@ def viewwrapper(file_path):
         print u'要查看网易加固版本号，您可使用插件“网易加固版本号”获取'
     else:
         print apk_detect.wrapperSdk
-    return apk_detect.wrapperSdk,None
+    return apk_detect.wrapperSdk, None
 
 
 def zipalign(apk_path):
@@ -255,6 +255,8 @@ def zipalign(apk_path):
     retcode, msg = star.runcmd2(
         [PathManager.get_zipaligin_tool_path(), '-f', '4', apk_path,
          os.path.join(Utils.getparent(apk_path), output_apk_name)])
+    if retcode==0:
+        print 'zipalign successed'
     return retcode, msg
 
 
@@ -409,6 +411,7 @@ def viewphone(f):
 # 从配置文件读取scale的值，如果配置文件中未设置scale则将其设置为0.5(默认值)
 # 截屏之后图片自动保存至系统剪贴板，可直接粘贴使用
 def photo(file_path):
+    print u'注意该功能需要先连接手机或者模拟器，请确保您在使用该选项时满足此条件'
     # 此处要注意从配置文件中读取出来的数值属于字符串类型，需要转换为数值类型
     scale = float(Utils.get_value_from_confing('ScaleSize', 'Scale'))
     if not scale:  # 如果配置文件未设置Scale字段
@@ -422,8 +425,11 @@ def photo(file_path):
     image.convert("RGB").save(output, "BMP")
     data = output.getvalue()[14:]
     output.close()
-    pyperclip.copy(data)
-    print '图片已经复制到了剪贴板，您可直接粘贴使用'
+    win32clipboard.OpenClipboard()
+    win32clipboard.EmptyClipboard()
+    win32clipboard.SetClipboardData(win32con.CF_DIB, data)
+    win32clipboard.CloseClipboard()
+    print u'图片已经复制到了剪贴板，您可直接粘贴使用'
     return 0, None
 
 
@@ -447,7 +453,7 @@ def extracticon(apk_path):
             num += 1
             icon_file = apk_dir + '_' + str(num) + '.png'
             file(icon_file, 'wb').write(zfile.read(icon))
-        print '不同分辨率的图标已经提取完成，路径位于和apk同级目录下'
+        print u'不同分辨率的图标已经提取完成，路径位于和apk同级目录下'
     return retcode, msg
 
 
@@ -461,11 +467,14 @@ def baksmali(f):
 def smali(f):
     return star.runcmd2([PathManager.get_apktool_path(), 'b', f])
 
+
 def md2html(f):
     return star.runcmd2([PathManager.get_mdconverter_path(), f])
 
+
 def md2pdf(f):
     return star.runcmd2([PathManager.get_mdconverter_path(), f, 'pdf'])
+
 
 def plug(f):
     os.system('pause')
@@ -480,6 +489,7 @@ def checkThirdParty():
     # except Exception as e:
     #     print traceback.format_exc()
     pass
+
 
 if __name__ == '__main__':
     ret = 0

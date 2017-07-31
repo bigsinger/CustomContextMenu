@@ -1,13 +1,9 @@
 # coding: utf-8
-import base64
+
 import os, re, platform
-import shutil
 import zipfile
 import sys
 from zipmgr import zipmgr
-from PathManager import PathManager
-import star
-import Utils
 
 reload(sys)
 sys.setdefaultencoding('gbk')

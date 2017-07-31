@@ -9,8 +9,11 @@ from pygments.lexers import get_lexer_by_name
 from pygments.formatters import html
 from weasyprint import HTML
 
-# 使用此脚本需要安装mistune
+# 使用此脚本需要安装mistune,weasyprint,pygment,markdown2
 # pip install mistune
+# pip install pygment
+# pip install weasyprint
+# pip install markdown2
 
 
 # 返回当前脚本的全路径，末尾不带\
