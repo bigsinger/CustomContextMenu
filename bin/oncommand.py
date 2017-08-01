@@ -138,7 +138,7 @@ def plug_get_neprotect_ver(apk_path):
     version = None
     try:
         import NEProtectVerManager
-        version = NEProtectVerManager.get_version(apk_path,PathManager.get_aapt_path())
+        version = NEProtectVerManager.get_version(apk_path, PathManager.get_aapt_path())
     except Exception as e:
         print traceback.format_exc()
         os.system('pause')
@@ -152,21 +152,19 @@ def plug_get_neprotect_ver(apk_path):
 
 # 支持APK、DEX转换为Jar，
 def dex2jar(f):
-    # 如果操作的是apk，则将apk中全部的dex转换为jar文件输出到在apk同级目录下创建的jar目录下
+    # 如果操作的是apk，则将apk中全部的dex转换为jar文件输出到在apk同级目录下
     if f.endswith('.apk'):
-        ouput_jar_path = os.path.join(os.path.dirname(f), 'jar')
+        output_jar_prefix = os.path.splitext(f)[0] + '_'
         temp_dex_dir = PathManager.get_temp_dir_path()
         ZipManager.unzip_dexFile_to_dest(f, temp_dex_dir)
         filenames = os.listdir(temp_dex_dir)
         for dex_name in filenames:
-            print dex_name
             if dex_name.endswith('.dex'):
                 dex_file_path = os.path.join(temp_dex_dir, dex_name)
-                jar_file = os.path.splitext(dex_name)[0]
-                retcode, msg = star.runcmd2([PathManager.get_dex2jar_path(), dex_file_path, '-f', '-o',
-                                             os.path.join(ouput_jar_path, jar_file + '.jar')])
+                jar_file = output_jar_prefix + os.path.splitext(dex_name)[0] + '.jar'
+                retcode, msg = star.runcmd2([PathManager.get_dex2jar_path(), dex_file_path, '-f', '-o', jar_file])
                 if retcode == 0:
-                    star.run_cmd_asyn([PathManager.get_jdgui_path(), os.path.join(ouput_jar_path, jar_file + '.jar')])
+                    star.run_cmd_asyn([PathManager.get_jdgui_path(), jar_file])
                     print 'dex2jar ok'
         shutil.rmtree(temp_dex_dir)
         return retcode, msg
@@ -195,6 +193,7 @@ def axml2txt(f):
                 txtFile = axmlFile + '.txt'
                 star.runcmd2([PathManager.get_axmlprinter_path(), axmlFile, '>', txtFile])
                 break
+        os.remove(axmlFile)
     else:
         txtFile = f + '.txt'
         ret, msg = star.runcmd2([PathManager.get_axmlprinter_path(), f, '>', txtFile])
@@ -255,7 +254,7 @@ def zipalign(apk_path):
     retcode, msg = star.runcmd2(
         [PathManager.get_zipaligin_tool_path(), '-f', '4', apk_path,
          os.path.join(Utils.getparent(apk_path), output_apk_name)])
-    if retcode==0:
+    if retcode == 0:
         print 'zipalign successed'
     return retcode, msg
 
@@ -440,7 +439,6 @@ def extracticon(apk_path):
     if retcode == 0:
         icons = star.findall("icon.*?'(.+?)'", msg)
         icons = list(set(icons))
-        # print icons
         # icons匹配出来的字符串可能不是图片格式，这里过滤删除下
         for i in range(len(icons) - 1, -1, -1):
             if not (icons[i].endswith('.png') or icons[i].endswith('.jpg')
@@ -448,11 +446,19 @@ def extracticon(apk_path):
                 icons.remove(icons[i])
 
         zfile = zipfile.ZipFile(apk_path, 'r', compression=zipfile.ZIP_DEFLATED)
-        num = 0
+
         for icon in icons:
-            num += 1
-            icon_file = apk_dir + '_' + str(num) + '.png'
+            icon_name = '_' + os.path.splitext(os.path.basename(icon))[0]
+            icon_file = apk_dir + '_temp.png'
             file(icon_file, 'wb').write(zfile.read(icon))
+            image = Image.open(icon_file)
+            image_size = '_' + str(image.size[0])
+            image.close()  # 一定要调用close否则下面的rename会出现异常
+            new_icon_file = apk_dir + icon_name + image_size + '.png'
+            if not os.path.exists(new_icon_file):
+                os.rename(icon_file, new_icon_file)
+            else:  # 如果当前目录下已存在提取后重新命名的文件，则删除临时文件而不是重命名
+                os.remove(icon_file)
         print u'不同分辨率的图标已经提取完成，路径位于和apk同级目录下'
     return retcode, msg
 
