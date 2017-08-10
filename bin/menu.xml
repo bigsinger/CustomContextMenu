@@ -2,8 +2,6 @@
 <menu name="右键增强工具" icon="icon\logo.png">
   <menu name="复制路径" icon="icon\copypath.png" tag="copypath"/>
   <menu name="记事本打开" icon="icon\notepad.png" tag="notepad"/>
-  <menu name="WinHex打开" icon="icon\hex.png" tag="hex"/>
-  <menu name="LuaEditor打开" icon="icon\lua.png" tag="lua"/>
   <menu name="查看MD5" icon="icon\5.png" tag="md5"/>
   <menu/>
   <menu name="jd-gui打开" icon="icon\dex2jar.png" tag="jdgui"/>
@@ -26,9 +24,7 @@
   <menu name="回编译" icon="icon\build.png" tag="smali"/>
   <menu name="自定义插件" icon="icon\plug.png">
     <menu name="网易加固版本号获取" tag="plug_get_neprotect_ver"/>
-    <menu name="MD转换HTML" tag="md2html"/>
-    <menu name="MD转换PDF" tag="md2pdf"/>
-    <menu name="插件4" tag="plug4"/>
+    <menu name="插件2" tag="plug4"/>
   </menu>
   <menu name="关于 v3.0" icon="icon\about.png" tag="about"/>
 </menu>
