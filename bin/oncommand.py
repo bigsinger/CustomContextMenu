@@ -85,6 +85,8 @@ def on_command(params):
         ret, msg = viewwrapper(filesSelected)
     elif CMD_STR == 'phone':
         ret, msg = viewphone(filesSelected)
+        if ret == 0:
+            os.system('pause')
     elif CMD_STR == 'photo':
         ret, msg = photo(filesSelected)
         os.system('pause')
@@ -125,10 +127,15 @@ def on_command(params):
         print u'open with luyten'
         tool = PathManager.get_luyten_path()
         ret, msg = star.run_cmd_asyn([star.unicode2gbk(tool), star.unicode2gbk(filesSelected)])
+        if ret != 0:  # 说明此时执行命令出错，暂停下让用户能够看到cmd窗口的出错信息
+            os.system('pause')
     elif CMD_STR == 'jdgui':
         print u'open with jdgui'
         tool = PathManager.get_jdgui_path()
         ret, msg = star.run_cmd_asyn([star.unicode2gbk(tool), star.unicode2gbk(filesSelected)])
+    elif CMD_STR == 'md5':
+        ret, msg = md5(filesSelected)
+        os.system('pause')
     else:
         return -1, u'未实现命令：' + CMD_STR + u'请检查您输入的命令是否正确'
     return ret, msg
@@ -147,6 +154,20 @@ def plug_get_neprotect_ver(apk_path):
         print u'当前apk使用的网易云加密的版本号为： ' + version
         return version, None
     else:
+        return None, None
+
+
+def md5(apk_file):
+    if not apk_file.endswith('.apk'):
+        print u"该文件不是apk文件，请选择一个apk文件"
+        return None, None
+    else:
+        cmd = Constant.KEYTOOL_FILENAME + ' -printcert' + ' -jarfile ' + apk_file
+        result = os.popen(cmd)
+        for line in result.readlines():
+            if "MD5" in line:
+                print line
+                return line, None
         return None, None
 
 
@@ -175,6 +196,10 @@ def dex2jar(f):
             star.run_cmd_asyn([PathManager.get_jdgui_path(), jarFile])
             print 'dex2jar ok'
         return retcode, msg
+    else:
+        print u'选择文件不合法，文件格式需要是apk或者dex格式'
+        os.system("pause")
+        return 0, None
 
 
 # AXML文件转换为纯文本，如果是APK包则自动抽取AndroidManifest.xml并转换。
@@ -316,7 +341,7 @@ def detectApk(apk_path):
 # 查看APK的签名信息
 def viewsign(f):
     infoFile = os.path.splitext(f)[0] + '_signinfo.txt'
-    code, info = star.runcmd2([PathManager.get_keytool_path(), '-printcert', '-jarfile', f])
+    code, info = star.runcmd2([Constant.KEYTOOL_FILENAME, '-printcert', '-jarfile', f])
     if code == 0:
         star.log(info, infoFile)
         if os.path.exists(infoFile):
@@ -372,6 +397,9 @@ def uninstall(f):
 # 查看手机信息
 def viewphone(f):
     adb = ADBManager()
+    if adb.is_no_devices:
+        print u"该功能需要连接手机或者模拟器，请确保手机或者模拟器已经启动"
+        return 0, None
     ret, model = adb.shell('getprop ro.product.model')
     ret, name = adb.shell('getprop ro.product.name')
     ret, release = adb.shell('getprop ro.build.version.release')
@@ -399,24 +427,28 @@ def viewphone(f):
     star.loga('IMEI：' + imei, infoFile)
     star.loga('AndroidId：' + androidid, infoFile)
     star.loga('描述信息：' + description, infoFile)
-    star.loga('分辨率：' + size, infoFile)
+    if size is not None:  # 获取分辨率如果失败size将会是None对象，此时不能使用+连接
+        star.loga('分辨率：' + size, infoFile)
 
     if os.path.exists(infoFile):
         star.run_cmd_asyn(['notepad', infoFile])
-    return 0, None
+    return 1, None
 
 
 # 手机截屏并保存位png图片
 # 从配置文件读取scale的值，如果配置文件中未设置scale则将其设置为0.5(默认值)
 # 截屏之后图片自动保存至系统剪贴板，可直接粘贴使用
 def photo(file_path):
-    print u'注意该功能需要先连接手机或者模拟器，请确保您在使用该选项时满足此条件'
+    adb = ADBManager()
+    if adb.is_no_devices:
+        print u"该功能需要连接手机或者模拟器，请确保手机或者模拟器已经启动"
+        return 0, None
     # 此处要注意从配置文件中读取出来的数值属于字符串类型，需要转换为数值类型
     scale = float(Utils.get_value_from_confing('ScaleSize', 'Scale'))
     if not scale:  # 如果配置文件未设置Scale字段
         scale = 0.5
     image_file = os.path.splitext(file_path)[0] + '.png'
-    adb = ADBManager()
+
     adb.get_screenshot(image_file, scale)
     # 将图片复制到剪贴板需要先将图片数据写到内存中
     image = Image.open(image_file)

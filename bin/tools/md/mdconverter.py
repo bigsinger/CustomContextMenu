@@ -81,7 +81,8 @@ def convert_md_file(argv):
 
     if is_convert_html:
         # save to html file
-        with codecs.open(html_filename, 'w', encoding='utf-8', errors='xmlcharrefreplace') as f:
+        #在windows下encoding需要指定为gbk，不能指定为utf-8否则会出现乱码
+        with codecs.open(html_filename, 'w', encoding='gbk', errors='xmlcharrefreplace') as f:
             f.write(css_text + html_text)
         if os.path.exists(html_filename):
             os.popen(html_filename)
