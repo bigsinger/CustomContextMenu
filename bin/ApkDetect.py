@@ -40,7 +40,7 @@ class ApkDetect:
                        r'libbaiduprotect\S*.so', 'libnesec.so|data.db|clazz.jar', r'libAPKProtect\S*.so']
         self.protectflag_dict = {1: u"梆梆加固", 2: u"360加固", 3: u"通付盾加固",
                                  4: u"网秦加固", 5: u"腾讯加固", 6: u"爱加密加固",
-                                 7: u"娜迦加固", 8: u"阿里加固", 9: u"百度加固", 10: u"网易云加密",
+                                 7: u"娜迦加固", 8: u"阿里加固", 9: u"百度加固", 10: u"网易易盾加密",
                                  11: u"APKProtect加固", 0: u"NO WRAPPER"}
         self.appName_regex = [re.compile(self.applicationName[0], re.I), re.compile(self.applicationName[1], re.I),
                               re.compile(self.applicationName[2], re.I), re.compile(self.applicationName[3], re.I),

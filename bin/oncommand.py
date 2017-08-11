@@ -151,7 +151,7 @@ def plug_get_neprotect_ver(apk_path):
         os.system('pause')
         return None, None
     if version:
-        print u'当前apk使用的网易云加密的版本号为： ' + version
+        print u'当前apk使用的网易易盾加密的版本号为： ' + version
         return version, None
     else:
         return None, None

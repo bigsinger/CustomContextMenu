@@ -1,6 +1,7 @@
 *.pyc
 bin/tools/jdgui/jd-gui.cfg
 bin/tools/sign/sign.db
+bin/tools/dex2jar-2.0/*.sh
 NEProtectVerManager.py
 NEProtectVerManager.pyc
 .idea
