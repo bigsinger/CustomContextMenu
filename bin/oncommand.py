@@ -8,19 +8,19 @@
 author: bigsing
 '''
 import os
+import re
 import sys
 import shutil
 import zipfile
 import traceback
-import re
-import win32clipboard
-import win32con
 import ZipManager
-from PIL import Image
 from cStringIO import StringIO
 
 try:
     import star
+    import win32con
+    import win32clipboard
+    from PIL import Image
     from star.APK import APK
     from star.AXMLPrinter import *
     from star.ADBManager import ADBManager
