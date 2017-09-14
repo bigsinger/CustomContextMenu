@@ -9,19 +9,19 @@ author: bigsing
 '''
 import json
 import os
+import re
 import sys
 import shutil
 import zipfile
 import traceback
-import re
-import win32clipboard
-import win32con
 import ZipManager
-from PIL import Image
 from cStringIO import StringIO
 
 try:
     import star
+    import win32con
+    import win32clipboard
+    from PIL import Image
     from star.APK import APK
     from star.AXMLPrinter import *
     from star.ADBManager import ADBManager
@@ -450,7 +450,7 @@ def viewphone(f):
 # 截屏之后图片自动保存至系统剪贴板，可直接粘贴使用
 def photo(file_path):
     adb = ADBManager()
-    if adb.is_no_devices:
+    if len(adb.get_devices()) == 0:
         print u"该功能需要连接手机或者模拟器，请确保手机或者模拟器已经启动"
         return 0, None
     # 此处要注意从配置文件中读取出来的数值属于字符串类型，需要转换为数值类型
