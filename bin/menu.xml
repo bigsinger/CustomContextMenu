@@ -24,7 +24,7 @@
   <menu name="回编译" icon="icon\build.png" tag="smali"/>
   <menu name="自定义插件" icon="icon\plug.png">
     <menu name="网易加固版本号获取" tag="plug_get_neprotect_ver"/>
-    <menu name="插件2" tag="plug4"/>
+    <menu name="md2pdf" tag="md2pdf"/>
   </menu>
   <menu name="关于 v3.0" icon="icon\about.png" tag="about"/>
 </menu>

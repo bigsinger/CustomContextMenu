@@ -7,6 +7,7 @@
 
 author: bigsing
 '''
+import json
 import os
 import sys
 import shutil
@@ -341,11 +342,20 @@ def detectApk(apk_path):
 # 查看APK的签名信息
 def viewsign(f):
     infoFile = os.path.splitext(f)[0] + '_signinfo.txt'
-    code, info = star.runcmd2([Constant.KEYTOOL_FILENAME, '-printcert', '-jarfile', f])
+    check_v2sign_tool_path = PathManager.get_checkV2_sign_tool_path()
+    code, info = star.runcmd2(['java', '-jar', check_v2sign_tool_path, f])
+    if code == 0:
+        msg_dic = json.loads(info)
+        if msg_dic['isV1OK']:  # 如果使用了v1签名，不管是否使用了v2签名检测v1签名
+            code, info = star.runcmd2([Constant.KEYTOOL_FILENAME, '-printcert', '-jarfile', f])
+        if msg_dic['isV2'] and not msg_dic['isV1OK']:  # 未使用v1签名，仅仅使用了v2签名
+            info += u"该apk仅仅使用了v2签名，未使用v1签名，具体信息如上所示"
+
     if code == 0:
         star.log(info, infoFile)
         if os.path.exists(infoFile):
             star.run_cmd_asyn(['notepad', infoFile])
+
     return code, info
 
 

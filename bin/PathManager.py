@@ -84,3 +84,7 @@ class PathManager:
     @staticmethod
     def get_zipaligin_tool_path():
         return os.path.join(Utils.getthispath(), 'tools\\zipalign.exe')
+
+    @staticmethod
+    def get_checkV2_sign_tool_path():
+        return os.path.join(Utils.getthispath(), 'tools\\sign\\CheckAndroidV2SignatureByAPKSig.jar')
