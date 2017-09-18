@@ -2,6 +2,8 @@
 <menu name="右键增强工具" icon="icon\logo.png">
   <menu name="复制路径" icon="icon\copypath.png" tag="copypath"/>
   <menu name="记事本打开" icon="icon\notepad.png" tag="notepad"/>
+  <menu name="WinHex打开" icon="icon\hex.png" tag="hex"/>
+  <menu name="LuaEditor打开" icon="icon\lua.png" tag="lua"/>
   <menu name="查看MD5" icon="icon\5.png" tag="md5"/>
   <menu/>
   <menu name="jd-gui打开" icon="icon\dex2jar.png" tag="jdgui"/>
