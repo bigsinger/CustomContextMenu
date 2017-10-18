@@ -33,7 +33,7 @@ except Exception as e:
     print traceback.format_exc()
     os.system('pause')
 
-DEBUG = False
+DEBUG = True
 
 '''
 params: [0]oncommand.py [1]command  [2]filepath [files]
@@ -407,7 +407,7 @@ def uninstall(f):
 # 查看手机信息
 def viewphone(f):
     adb = ADBManager()
-    if adb.is_no_devices:
+    if len(adb.get_devices()) == 0:
         print u"该功能需要连接手机或者模拟器，请确保手机或者模拟器已经启动"
         return 0, None
     ret, model = adb.shell('getprop ro.product.model')
@@ -545,7 +545,7 @@ if __name__ == '__main__':
     checkThirdParty()
     try:
         if DEBUG:
-            ret, msg = on_command([__file__, 'dex2jar', os.path.join(Utils.get_desktop_path(), 'jartest\\boss.apk')])
+            ret, msg = on_command([__file__, 'phone', os.path.join(Utils.get_desktop_path(), 'test\\cpu.apk')])
         else:
             ret, msg = on_command(sys.argv)
         if ret != 0 and ret is not None:
