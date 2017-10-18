@@ -33,7 +33,7 @@ except Exception as e:
     print traceback.format_exc()
     os.system('pause')
 
-DEBUG = True
+DEBUG = False
 
 '''
 params: [0]oncommand.py [1]command  [2]filepath [files]
