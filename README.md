@@ -4,19 +4,6 @@
 ## .NET Framework v4.0
 下载地址：[Download Microsoft \.NET Framework 4（独立安装程序） from Official Microsoft Download Center](https://www.microsoft.com/zh-cn/download/confirmation.aspx?id=17718)
 
-## Python2.7
-由于菜单响应事件是由py编写的，所以需要安装Python，选择的版本是2.7，下载地址：[Python 2\.7\.0 Release \| Python\.org](https://www.python.org/download/releases/2.7/)
-
-## star库
-由于菜单响应事件是由py编写的，且使用了三方的star库，所以需要安装一下，具体步骤：
->在Python安装目录的lib文件夹下（如D:\Python27\Lib），直接gitclone地址：https://github.com/bigsinger/star
-
-## pywin32    
-如果你的机器上未安装该模块，需要下载对应的版本安装，下载地址：[pywin32](https://sourceforge.net/projects/pywin32/files/pywin32/Build%20221/)
-安装版本需要对应你使用的python版本保持一致，否则安装后使用会出现dll load failed: 1% 不是有效的win32的错误，python版本主要是看版本号和python位数，在命令行输入python命令可以查看，如果python版本为2.7，32位，则下载pywin32时需要选择版本为2.7的32位，如果python版本为3.x的64位，则下载对应3.x版本的64位
-
-代码中可能会依赖很多三方库，如果运行脚本出现 ImportError: No module name xxx时可能是未安装xxx库，需要先安装，可在命令行执行pip install xxx（缺少的库的名称）即可  
-
 # 安装
 务必**以管理员身份运行**reg.bat进行注册，注册原理见其源码：
 
@@ -133,3 +120,21 @@ oncommand.py tag file files
 ![](https://github.com/bigsinger/CustomContextMenu/blob/master/screenshot1.png?raw=true)
 
 ![](https://github.com/bigsinger/CustomContextMenu/blob/master/screenshot2.png?raw=true)
+
+
+# 菜单响应插件
+本工具默认自带一个关于“Android右键工具”的响应插件（Python脚本实现），对应目录在plug目录下，由oncommand.lua直接调用。如果要实现自己的菜单响应插件，可以自己实现一套plug。
+
+要想使用本工具的默认菜单响应插件，需要安装Python3的环境，请按如下步骤操作：
+## Python3.X
+由于菜单响应事件是由py编写的，所以需要安装Python，选择的版本是3.X，下载地址：[Download Python](https://www.python.org/downloads/)
+
+## star库
+由于菜单响应事件是由py编写的，且使用了三方的star库，所以需要安装一下，具体步骤：
+>在Python安装目录的lib文件夹下（如D:\Python27\Lib），直接gitclone地址：https://github.com/bigsinger/star
+
+## 其他Python3三方依赖库
+```
+pip3 install pywin32
+pip3 install configparser
+```  
