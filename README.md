@@ -115,8 +115,8 @@ Types un-registered successfully
 ![](./doc/screenshot2.png)
 
 
-## 如何响应事件
-当用户点击菜单项时，菜单的tag名称会被传递到oncommand.py中，参数形式为：
+## 2、如何响应事件
+当用户点击菜单项时，菜单的tag名称会被传递到./plug/oncommand.py中，参数形式为：
 ```
 oncommand.py tag file [files]
 ```
@@ -131,7 +131,7 @@ oncommand.py tag file files
 也即出现开关files，也可以认为多了一个参数标志。当出现这个标志时，file是一个纯文本的文件全路径，内容是用户选择的多个文件列表，逐行列出。可以在py文件中自行处理多个文件的菜单响应事件，这里并没有实现。
 
 
-### 2、菜单响应插件
+### 菜单响应插件
 本工具默认自带一个关于“Android右键工具”的响应插件（Python脚本实现），对应目录在plug目录下，由oncommand.lua直接调用。如果要实现自己的菜单响应插件，可以自己实现一套plug。
 
 要想使用本工具的默认菜单响应插件，需要安装Python3的环境，请按如下步骤操作：
