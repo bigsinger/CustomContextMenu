@@ -2,26 +2,29 @@
 
 import os
 import sys
-import tempfile
 import _winreg
-from subprocess import check_output, CalledProcessError
-import subprocess
-import ConfigParser
 from PathManager import PathManager
+
+try:
+    import configparser
+except Exception as e:
+    print("module is't installed,please used 'pip install configparser' commmond to install it")
 
 
 # 返回当前脚本的全路径，末尾不带\
 def getthispath():
     path = sys.path[0]
-    #判断为脚本文件还是py2exe编译后的文件，如果是脚本文件，则返回的是脚本的目录，如果是py2exe编译后的文件，则返回的是编译后的文件路径
+    # 判断为脚本文件还是py2exe编译后的文件，如果是脚本文件，则返回的是脚本的目录，如果是py2exe编译后的文件，则返回的是编译后的文件路径
     if os.path.isdir(path):
         return path
     elif os.path.isfile(path):
         return os.path.split(path)[0]
 
+
 def get_file_ext(path):
-    print os.path.splitext(path)
+    print(os.path.splitext(path))
     # return os.path.splitext(path)[1]
+
 
 # 获取路径的父目录，末尾不带\
 def getparent(filepath):
@@ -34,6 +37,7 @@ def getparent(filepath):
         return lsPath[0]
     lsPath = os.path.split(lsPath[0])
     return lsPath[0]
+
 
 # 创建多级目录，比如c:\\test1\\test2,如果test1 test2都不存在，都将被创建
 def create_dirs(to_create_path):
@@ -64,12 +68,14 @@ def delete_file(to_del_file):
 
 
 def get_value_from_confing(node_name, item_name):
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     with open(PathManager.get_config_file_path(), 'r') as config_file:
         config.readfp(config_file)
         return config.get(node_name, item_name)
 
+
 # 返回桌面全路径，末尾不带\
 def get_desktop_path():
-    key = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, r'Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders',)
+    key = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER,
+                          r'Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders', )
     return _winreg.QueryValueEx(key, "Desktop")[0]

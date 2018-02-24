@@ -1,0 +1,7 @@
+androguard==3.0.1
+beautifulsoup4==4.4.0
+image==1.5.5
+Pillow==4.1.1
+pywin32==222
+pypiwin32
+requests==2.18.1

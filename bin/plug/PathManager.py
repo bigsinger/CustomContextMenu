@@ -50,6 +50,10 @@ class PathManager:
         return signtool
 
     @staticmethod
+    def get_v2_sign_tool_path():
+        return os.path.join(Utils.getthispath(), 'tools\\sign\\v2sign.bat')
+
+    @staticmethod
     def get_hextool_path():
         return u'F:/360云盘/Tools/5.编辑类/WinHex_x64.exe'
 
@@ -88,3 +92,7 @@ class PathManager:
     @staticmethod
     def get_checkV2_sign_tool_path():
         return os.path.join(Utils.getthispath(), 'tools\\sign\\CheckAndroidV2SignatureByAPKSig.jar')
+
+    @staticmethod
+    def get_require_txt_path():
+        return os.path.join(Utils.getthispath(), '..\\..\\requirements.txt')

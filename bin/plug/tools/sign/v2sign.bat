@@ -3,7 +3,7 @@ set apk=%~1
 
 cd /d %dir%
 
-java -jar apksigner.jar -notupdate -appname 测试 -keystore debug.keystore -alias androiddebugkey -pswd android -v1 true "%apk%"
+java -jar apksigner.jar -notupdate -appname 测试 -keystore debug.keystore -alias androiddebugkey -pswd android -aliaspswd android -v1 false -v2 true "%apk%"
 
 ::参数说明：
 ::-appname：待签名的应用程序名，可选，但建议不同的APP填上对应的app名（可以为中文），有助于【加速】 

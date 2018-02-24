@@ -35,8 +35,8 @@ def unzip_apk_file_to_dest(src_file,dest_file):
                 file.write(zfobj.read(oriname))
                 file.flush()
                 file.close()
-    except Exception, e:
-        logging.error(u"[ZipManager.unpack] 解压%s到%s,失败，原因：%s", src_file, dest_file, e)
+    except Exception as e:
+        logging.error("[ZipManager.unpack] 解压%s到%s,失败，原因：%s", src_file, dest_file, e)
         return False
     return True
 
@@ -59,7 +59,7 @@ def unzip_dexFile_to_dest(apk_path,dest_path):
         return None
 
 if __name__=='__main__':
-    apk_path='C:\Users\hzhuqi\Desktop\python\input.apk'
+    apk_path='C:\\Users\hzhuqi\Desktop\python\input.apk'
     filename='.dex'
-    dest_path='C:\Users\hzhuqi\Desktop\python\input'
+    dest_path='C:\\Users\hzhuqi\Desktop\python\input'
     unzip_dexFile_to_dest(apk_path,dest_path)

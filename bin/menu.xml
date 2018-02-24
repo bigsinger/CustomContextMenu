@@ -12,7 +12,8 @@
   <menu name="Manifest 》TXT | AXML 》TXT" icon="icon\m2txt.png" tag="axml2txt"/>
   <menu name="查看APK信息" icon="icon\apkinfo.png" tag="viewapk"/>
   <menu name="查看签名信息" icon="icon\signinfo.png" tag="viewsign"/>
-  <menu name="签名" tag="sign" icon="icon\sign.png"/>
+  <menu name="签名V1" tag="sign" icon="icon\sign.png"/>
+  <menu name="签名V1+V2" tag="sign_v1_v2" icon="icon\sign.png"/>
   <menu/>
   <menu name="安装（卸载安装）" icon="icon\install.png" tag="installd"/>
   <menu name="安装（替换安装）" icon="icon\installr.png" tag="installr"/>

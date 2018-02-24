@@ -71,7 +71,7 @@ class ApkDetect:
             zfobj = zipfile.ZipFile(apk_path)
             self.zipnamelist = zfobj.namelist()
             zfobj.close()
-        except Exception, e:
+        except Exception as e:
             # print "%s" % e
             self.lastError = u'获取apk中文件列表异常'
             return False
@@ -142,22 +142,22 @@ class ApkDetect:
 
     def saveIcon(self):
         if not os.path.exists(self.apk_path):
-            print u'apk 路径不存在'
+            print(u'apk 路径不存在')
             return False
         result = self.getApkInfo()
         if not result:
-            print u'获取apk图标路径失败'
+            print(u'获取apk图标路径失败')
             return False
         self.rootpath, file = os.path.split(self.apk_path)
 
         result = zipmgr.unzip_allIocn_to_dir(self.apk_path, self.iconName, self.rootpath)
         if not result:
-            print u'解压apk图标失败'
+            print(u'解压apk图标失败')
             return False
 
         # icon_path = os.path.join(self.rootpath, filename)
         # print icon_path
-        print u'提取图标完成'
+        print(u'提取图标完成')
         return True
 
     # 获取APK的加壳SDK信息
@@ -178,7 +178,7 @@ class ApkDetect:
                 if not find:
                     for key in range(len(self.soName)):
                         result = self.soName_regex[key].search(fileName)
-                        print result
+                        print(result)
                         if result:
                             if key == 9:  # 如果是网易加固壳，则获取出加固的版本号
                                 self.is_netease_protect = True
@@ -192,13 +192,11 @@ class ApkDetect:
             # print self.apk_path + ": So: " + self.wrapperSdk
             # print "[WrapperSdk] ",self.wrapperSdk
             return True
-        except Exception, e:
+        except Exception as e:
             # print "parser wrap sdk error: "
             # logging.error(e)
             self.lastError = 'parser wrap sdk error'
             return False
-
-
 
     def getBurptID(self):
         try:
@@ -207,7 +205,7 @@ class ApkDetect:
             if m:
                 self.bugrptId = 'BUGRPT_APPID:' + str(m.group(1))
                 return True
-        except Exception, e:
+        except Exception as e:
             self.bugrptId = ''
         return False
 
@@ -236,12 +234,12 @@ class ApkDetect:
 if __name__ == "__main__":
     # 初始化地址
     if len(sys.argv) != 4:
-        print u"输入的参数不正常"
+        print(u"输入的参数不正常")
     else:
         dit = {'apkPath': '', 'aaptPath': ''}
-        dit['apkPath'] = unicode(sys.argv[1], "gbk")
-        dit['aaptPath'] = unicode(sys.argv[2], "gbk")
-        flag = unicode(sys.argv[3], "gbk")
+        dit['apkPath'] = str(sys.argv[1], "gbk")
+        dit['aaptPath'] = str(sys.argv[2], "gbk")
+        flag = str(sys.argv[3], "gbk")
 
         ad = ApkDetect(dit)
         if flag == '1':  # 表示获取图标
@@ -250,14 +248,14 @@ if __name__ == "__main__":
             dit_result = ad.result()
 
             if len(dit_result) != 3:
-                print u"解析加壳sdk失败"
+                print(u"解析加壳sdk失败")
             else:
                 if dit_result['wrapperSdk'] == 'Failed':
-                    print dit_result['lastError'],
+                    print(dit_result['lastError'])
                 else:
-                    print dit_result['wrapperSdk'],
+                    print(dit_result['wrapperSdk'])
                     if dit_result['bugrptID'] != '':
-                        print dit_result['bugrptID'],
+                        print(dit_result['bugrptID'])
 
                 # gameDetect = GameApkDetect(dit['apkPath'])
                 # dits = gameDetect.getResult()
@@ -265,4 +263,4 @@ if __name__ == "__main__":
                 # if dits['isu3d']:
                 #     print u' U3d脚本已经加密' if dits['issafe'] else u' U3d脚本未加密'
                 # else:
-                print ''
+                print('')

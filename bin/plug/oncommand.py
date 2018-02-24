@@ -12,25 +12,33 @@ import os
 import re
 import sys
 import shutil
-import zipfile
 import traceback
+import zipfile
 import ZipManager
 from cStringIO import StringIO
 
+plug_path = os.path.dirname(sys.argv[0])
+sys.path.append(os.path.dirname(plug_path))
+
 try:
-    import star
     import win32con
     import win32clipboard
     from PIL import Image
-    from star.APK import APK
-    from star.AXMLPrinter import *
-    from star.ADBManager import ADBManager
+    from third_part.lib_star import star
+    from third_part.lib_star.APK import APK
+    from third_part.lib_star.AXMLPrinter import *
+    from third_part.lib_star.ADBManager import ADBManager
     from PathManager import *
     from Constant import Constant
     from xml.dom import minidom
     from ApkDetect import ApkDetect
 except Exception as e:
-    print traceback.format_exc()
+    # 执行3方库安装命令
+    print(u"检测到所需的三方库未安装，已自动执行安装命令，如果仍然缺失某些三方库，请手动检查安装")
+    require_libs_path = PathManager.get_require_txt_path()
+    cmd = ['pip', 'install', '-r', require_libs_path]
+    star.runcmd2(cmd)
+    print(traceback.format_exc())
     os.system('pause')
 
 DEBUG = False
@@ -54,8 +62,8 @@ def on_command(params):
     paramCount = len(params)
     isMultiFiles = False
     if params is None or paramCount < 3:
-        print params[0]
-        print params[1]
+        print(params[0])
+        print(params[1])
         return -1, u'参数不对，需要传至少 3 个参数'
     CMD_STR = params[1]
     filesSelected = params[2]
@@ -64,7 +72,7 @@ def on_command(params):
     if sys.platform == 'win32':
         # win下命令行参数为gbk编码，转换为UNICODE
         filesSelected = filesSelected.decode('gbk', 'ignore')
-    print str(paramCount) + ' ' + CMD_STR + ' ' + filesSelected
+    print(str(paramCount) + ' ' + CMD_STR + ' ' + filesSelected)
 
     if CMD_STR == 'dex2jar':
         ret, msg = dex2jar(filesSelected)
@@ -76,6 +84,8 @@ def on_command(params):
         ret, msg = viewsign(filesSelected)
     elif CMD_STR == 'sign':
         ret, msg = sign(filesSelected)
+    elif CMD_STR == 'sign_v1_v2':
+        ret, msg = sign_v1_v2(filesSelected)
     elif CMD_STR == 'installd':
         ret, msg = installd(filesSelected)
     elif CMD_STR == 'installr':
@@ -111,27 +121,27 @@ def on_command(params):
     elif CMD_STR == 'plug3':
         ret, msg = plug(filesSelected)
     elif CMD_STR == 'about':
-        print u'右键工具v3.0 by bising'
+        print(u'右键工具v3.0 by bising')
         os.system('pause')
         # star.runcmd2([PathManager.get_about_path()])
     elif CMD_STR == 'notepad':
         ret, msg = star.run_cmd_asyn(['notepad', star.unicode2gbk(filesSelected)])
     elif CMD_STR == 'hex':
-        print u'open with hex tool'
+        print('open with hex tool')
         tool = PathManager.get_hextool_path()
         ret, msg = star.run_cmd_asyn([star.unicode2gbk(tool), star.unicode2gbk(filesSelected)])
     elif CMD_STR == 'lua':
-        print u'open with Lua Editor'
+        print('open with Lua Editor')
         tool = PathManager.get_luaeditor_path()
         ret, msg = star.run_cmd_asyn([star.unicode2gbk(tool), star.unicode2gbk(filesSelected)])
     elif CMD_STR == 'luyten':
-        print u'open with luyten'
+        print('open with luyten')
         tool = PathManager.get_luyten_path()
         ret, msg = star.run_cmd_asyn([star.unicode2gbk(tool), star.unicode2gbk(filesSelected)])
         if ret != 0:  # 说明此时执行命令出错，暂停下让用户能够看到cmd窗口的出错信息
             os.system('pause')
     elif CMD_STR == 'jdgui':
-        print u'open with jdgui'
+        print('open with jdgui')
         tool = PathManager.get_jdgui_path()
         ret, msg = star.run_cmd_asyn([star.unicode2gbk(tool), star.unicode2gbk(filesSelected)])
     elif CMD_STR == 'md5':
@@ -148,11 +158,11 @@ def plug_get_neprotect_ver(apk_path):
         import NEProtectVerManager
         version = NEProtectVerManager.get_version(apk_path, PathManager.get_aapt_path())
     except Exception as e:
-        print traceback.format_exc()
+        print(traceback.format_exc())
         os.system('pause')
         return None, None
     if version:
-        print u'当前apk使用的网易易盾加密的版本号为： ' + version
+        print(u'当前apk使用的网易易盾加密的版本号为： ' + version)
         return version, None
     else:
         return None, None
@@ -160,14 +170,14 @@ def plug_get_neprotect_ver(apk_path):
 
 def md5(apk_file):
     if not apk_file.endswith('.apk'):
-        print u"该文件不是apk文件，请选择一个apk文件"
+        print(u"该文件不是apk文件，请选择一个apk文件")
         return None, None
     else:
         cmd = Constant.KEYTOOL_FILENAME + ' -printcert' + ' -jarfile ' + apk_file
         result = os.popen(cmd)
         for line in result.readlines():
             if "MD5" in line:
-                print line
+                print(line)
                 return line, None
         return None, None
 
@@ -187,7 +197,7 @@ def dex2jar(f):
                 retcode, msg = star.runcmd2([PathManager.get_dex2jar_path(), dex_file_path, '-f', '-o', jar_file])
                 if retcode == 0:
                     star.run_cmd_asyn([PathManager.get_jdgui_path(), jar_file])
-                    print 'dex2jar ok'
+                    print('dex2jar ok')
         shutil.rmtree(temp_dex_dir)
         return retcode, msg
     elif f.endswith('.dex'):
@@ -195,10 +205,10 @@ def dex2jar(f):
         retcode, msg = star.runcmd2([PathManager.get_dex2jar_path(), f, '-f', '-o', jarFile])
         if retcode == 0:
             star.run_cmd_asyn([PathManager.get_jdgui_path(), jarFile])
-            print 'dex2jar ok'
+            print('dex2jar ok')
         return retcode, msg
     else:
-        print u'选择文件不合法，文件格式需要是apk或者dex格式'
+        print(u'选择文件不合法，文件格式需要是apk或者dex格式')
         os.system("pause")
         return 0, None
 
@@ -210,7 +220,7 @@ def axml2txt(f):
     ext = os.path.splitext(f)[1].lower()
     txtFile = None
     if ext == '.apk':
-        print 'axml2txt .apk'
+        print('axml2txt .apk')
         zfile = zipfile.ZipFile(f, 'r', compression=zipfile.ZIP_DEFLATED)
         for p in zfile.namelist():
             if p == "AndroidManifest.xml":
@@ -223,11 +233,11 @@ def axml2txt(f):
     else:
         txtFile = f + '.txt'
         ret, msg = star.runcmd2([PathManager.get_axmlprinter_path(), f, '>', txtFile])
-        print 'axml2txt .xml'
+        print('axml2txt .xml')
     if os.path.exists(txtFile):
         star.run_cmd_asyn(['notepad', txtFile])
 
-    print 'axml2txt ok'
+    print('axml2txt ok')
     return ret, msg
 
 
@@ -241,11 +251,11 @@ def viewapk(apk_path):
         versionName = star.find("versionName='(.*?)'", msg)
         appName = star.find("application-label:'(.*?)'", msg)
         activity = star.find("launchable-activity: name='(.*?)'", msg)
-        print package
-        print versionCode
-        print versionName
-        print appName
-        print activity
+        print(package)
+        print(versionCode)
+        print(versionName)
+        print(appName)
+        print(activity)
         # APK类型探测
         app_type, is_game_app = detectApk(apk_path)
         if is_game_app:
@@ -268,10 +278,10 @@ def viewwrapper(file_path):
     apk_detect.getXmlInfo()
     apk_detect.getWrapperSdk()
     if apk_detect.is_netease_protect:  # 如果是网易加固，提示使用插件获取
-        print apk_detect.wrapperSdk
-        print u'要查看网易加固版本号，您可使用插件“网易加固版本号”获取'
+        print(apk_detect.wrapperSdk)
+        print(u'要查看网易加固版本号，您可使用插件“网易加固版本号”获取')
     else:
-        print apk_detect.wrapperSdk
+        print(apk_detect.wrapperSdk)
     return apk_detect.wrapperSdk, None
 
 
@@ -281,7 +291,7 @@ def zipalign(apk_path):
         [PathManager.get_zipaligin_tool_path(), '-f', '4', apk_path,
          os.path.join(Utils.getparent(apk_path), output_apk_name)])
     if retcode == 0:
-        print 'zipalign successed'
+        print('zipalign successed')
     return retcode, msg
 
 
@@ -348,9 +358,12 @@ def viewsign(f):
         msg_dic = json.loads(info)
         if msg_dic['isV1OK']:  # 如果使用了v1签名，不管是否使用了v2签名检测v1签名
             code, info = star.runcmd2([Constant.KEYTOOL_FILENAME, '-printcert', '-jarfile', f])
+            if msg_dic['isV2']:
+                info += u"该apk使用了V1+V2签名，其中V1签名信息如上所示"
+            else:
+                info += u"该apk仅仅用了V1签名，其签名信息如上所示"
         if msg_dic['isV2'] and not msg_dic['isV1OK']:  # 未使用v1签名，仅仅使用了v2签名
             info += u"该apk仅仅使用了v2签名，未使用v1签名，具体信息如上所示"
-
     if code == 0:
         star.log(info, infoFile)
         if os.path.exists(infoFile):
@@ -364,15 +377,21 @@ def sign(f):
     return star.runcmd2([PathManager.get_signtool_path(), f])
 
 
+# 签名V1+V2
+def sign_v1_v2(f):
+    print(u"使用v1+v2签名")
+    return star.runcmd2([PathManager.get_v2_sign_tool_path(), f])
+
+
 # 通过命令行输出检查是否成功，最常见的问题就是“忘记签名”
 def checkIsInstalledSuccess(msg):
     if msg.find('Success') == -1:
         error = star.find('Failure \[(.*?)\]', msg)
         if error == 'INSTALL_PARSE_FAILED_NO_CERTIFICATES':
-            print u'没签名或者签名不对，请重新签名!\n错误详情：\n'
+            print (u'没签名或者签名不对，请重新签名!\n错误详情：\n')
         elif error == 'INSTALL_FAILED_OLDER_SDK':
-            print u'INSTALL_FAILED_OLDER_SDK 错误是什么鬼？\n'
-        print msg
+            print (u'INSTALL_FAILED_OLDER_SDK 错误是什么鬼？\n')
+        print (msg)
         os.system('pause')
 
 
@@ -408,7 +427,7 @@ def uninstall(f):
 def viewphone(f):
     adb = ADBManager()
     if len(adb.get_devices()) == 0:
-        print u"该功能需要连接手机或者模拟器，请确保手机或者模拟器已经启动"
+        print(u"该功能需要连接手机或者模拟器，请确保手机或者模拟器已经启动")
         return 0, None
     ret, model = adb.shell('getprop ro.product.model')
     ret, name = adb.shell('getprop ro.product.name')
@@ -451,7 +470,7 @@ def viewphone(f):
 def photo(file_path):
     adb = ADBManager()
     if len(adb.get_devices()) == 0:
-        print u"该功能需要连接手机或者模拟器，请确保手机或者模拟器已经启动"
+        print(u"该功能需要连接手机或者模拟器，请确保手机或者模拟器已经启动")
         return 0, None
     # 此处要注意从配置文件中读取出来的数值属于字符串类型，需要转换为数值类型
     scale = float(Utils.get_value_from_confing('ScaleSize', 'Scale'))
@@ -470,7 +489,7 @@ def photo(file_path):
     win32clipboard.EmptyClipboard()
     win32clipboard.SetClipboardData(win32con.CF_DIB, data)
     win32clipboard.CloseClipboard()
-    print u'图片已经复制到了剪贴板，您可直接粘贴使用'
+    print(u'图片已经复制到了剪贴板，您可直接粘贴使用')
     return 0, None
 
 
@@ -501,13 +520,13 @@ def extracticon(apk_path):
                 os.rename(icon_file, new_icon_file)
             else:  # 如果当前目录下已存在提取后重新命名的文件，则删除临时文件而不是重命名
                 os.remove(icon_file)
-        print u'不同分辨率的图标已经提取完成，路径位于和apk同级目录下'
+        print(u'不同分辨率的图标已经提取完成，路径位于和apk同级目录下')
     return retcode, msg
 
 
 # 反编译
 def baksmali(f):
-    print u'反编译完成'
+    print(u'反编译完成')
     return star.runcmd2([PathManager.get_apktool_path(), 'd', '-f', f])
 
 
@@ -529,30 +548,33 @@ def plug(f):
     return 0, None
 
 
-def checkThirdParty():
+def check_and_installed_third_part():
     # try:
-    #     from compiler.ast import flatten
-    #     import base64
-    #     import array
+    #     import win32con
+    #     import win32clipboard
+    #     from PIL import Image
     # except Exception as e:
+    #     # 执行安装命令
+    #     os.system("pip install -r requirements.txt")
     #     print traceback.format_exc()
+    # 放到最前面，因为发现后面要使用这些引入的module，放在这属于局部引入
     pass
 
 
 if __name__ == '__main__':
     ret = 0
     msg = None
-    checkThirdParty()
+    check_and_installed_third_part()
     try:
         if DEBUG:
-            ret, msg = on_command([__file__, 'phone', os.path.join(Utils.get_desktop_path(), 'test\\cpu.apk')])
+            ret, msg = on_command([__file__, 'installd', os.path.join(Utils.get_desktop_path(), 'nfcard.apk')])
         else:
             ret, msg = on_command(sys.argv)
         if ret != 0 and ret is not None:
-            print msg
+            print(msg)
             os.system('pause')
     except Exception as e:
-        print traceback.format_exc()
+        print(traceback.format_exc())
         os.system('pause')
     if not ret:
         sys.exit(-1)

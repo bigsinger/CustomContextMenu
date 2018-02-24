@@ -9,7 +9,7 @@ import Utils
 
 class zipmgr:
     def valid(self, filename):
-        print "test"
+        print("test")
 
     @staticmethod
     def unzip(apk_path, dst_path):
@@ -50,8 +50,8 @@ class zipmgr:
             zfobj = zipfile.ZipFile(apk_path)
             zipnamelist = zfobj.namelist()
             zfobj.close()
-        except Exception , e:
-            print "%s" % e
+        except Exception as e:
+            print("%s" % e)
         finally:
             return zipnamelist
 
@@ -179,12 +179,12 @@ class zipmgr:
                                 os.rename(filepath, dstfilePath)
                             else:
                                 Utils.delete_file(filepath)
-                        except Exception,e1:
+                        except Exception as e1:
                             # print e1
                             pass
             zfobj.close()
             return True
-        except Exception,e:
+        except Exception as e:
             Utils.delete_file(filepath)
             return False
 
