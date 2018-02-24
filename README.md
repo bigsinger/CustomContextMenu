@@ -136,11 +136,7 @@ oncommand.py tag file files
 
 要想使用本工具的默认菜单响应插件，需要安装Python3的环境，请按如下步骤操作：
 ### Python3.X
-由于菜单响应事件是由py编写的，所以需要安装Python，选择的版本是3.X，下载地址：[Download Python](https://www.python.org/downloads/)
-
-### star库
-由于菜单响应事件是由py编写的，且使用了三方的star库，所以需要安装一下，具体步骤：
->在Python安装目录的lib文件夹下（如D:\Python27\Lib），直接gitclone地址：https://github.com/bigsinger/star
+由于示例的菜单响应事件是由py脚本编写的，所以需要安装Python，选择的版本是3.X，下载地址：[Download Python](https://www.python.org/downloads/)
 
 ### 其他Python3三方依赖库
 ```
