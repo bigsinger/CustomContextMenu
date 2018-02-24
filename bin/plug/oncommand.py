@@ -29,6 +29,7 @@ try:
     from PathManager import PathManager
     from xml.dom import minidom
     from ApkDetect import ApkDetect
+    import Utils
     import win32con
     import win32clipboard
     from PIL import Image

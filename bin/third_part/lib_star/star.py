@@ -21,9 +21,7 @@ pycrypto https://www.dlitz.net/software/pycrypto/
 '''
 import os
 import sys
-import StringIO
 import base64
-import cookielib
 import ctypes
 import datetime
 import gzip
@@ -39,11 +37,12 @@ import struct
 import subprocess
 import time
 import urllib
-import urllib2
 import uuid
 import zlib
 import tempfile
 import traceback
+
+from io import StringIO
 from random import choice
 from bs4 import BeautifulSoup
 from subprocess import check_output, CalledProcessError, call
@@ -98,25 +97,25 @@ def initlogging(logFile = u"log.txt", toFile = False):
 
 '''
 把一段内容作为日志保存到当前目录下的log.txt文件中，每次重新创建，不追加！追加模式请使用loga函数。
-s：      将要被输出到日志文件的内容
+s：      将要被输出到日志文件的bytes内容，字符串不可用。如果是字符串请用with open(file, 'w')
 file：   默认为log.txt，也可以指定路径。
 mode：   日志文件的打开方式，默认为读写重新创建，也可以重新指定。
 '''
 def log(s, file = 'log.txt', mode = os.O_RDWR | os.O_CREAT):
     result = False
     fd = os.open(file, mode)
-    if fd > 0 :
+    if fd > 0 and s:
         try:
             os.write(fd, s)
             result = True
         except Exception as e:
-            print e.message
-            print 'can not access file: ' + file + ' open with os.O_RDWR?'
+            print(e)
+            print('can not access file: ' + file + ' open with os.O_RDWR?')
         finally:
             os.close(fd)
     else:
-        print 'open file error: ' + file
-        print fd
+        print('open file error: ' + file)
+        print(fd)
     return result
 
 '''
@@ -219,7 +218,7 @@ def timelimited(timeout):
                         startTime = time.time()
                         self._result = func(*args, **kwargs)
                         print(u"{0} end time: {1}".format(func.func_name, time.time() - startTime))
-                    except Exception, e:
+                    except Exception as e:
                         self._error = e
 
                 def _stop(self):
@@ -279,7 +278,7 @@ def getip():
 
 def getips():
     ips = socket.gethostbyname_ex(socket.gethostname())
-    print ips
+    print(ips)
 
 # import ctypes
 # import struct
@@ -305,11 +304,17 @@ def getmac():
     mac = ':'.join('%02X'%i for i in struct.unpack('BBBBBB', buffer))
     return mac
 
-# def setclipboard(s):
-#     win32clipboard.OpenClipboard()
-#     win32clipboard.EmptyClipboard()
-#     win32clipboard.SetClipboardText(s)
-#     win32clipboard.CloseClipboard()
+'''
+import pyperclip
+keyword = pyperclip.paste()
+--------------------------------
+or:
+--------------------------------
+def setclipboard(s):
+    win32clipboard.OpenClipboard()
+    win32clipboard.EmptyClipboard()
+    win32clipboard.SetClipboardText(s)
+    win32clipboard.CloseClipboard()
 
 def getclipboard():
     import win32clipboard
@@ -319,6 +324,15 @@ def getclipboard():
         s = win32clipboard.GetClipboardData(win32clipboard.CF_TEXT)
     win32clipboard.CloseClipboard()
     return s
+--------------------------------
+or:
+--------------------------------
+pip install clipboard
+import clipboard
+clipboard.copy("abc")  # now the clipboard content will be string "abc"
+text = clipboard.paste()  # text will have the content of clipboard
+'''
+
 
 #获取当前时间戳，10位
 def gettime10():
@@ -377,7 +391,7 @@ def runcmd(adb_cmd):
     except CalledProcessError as e:
         t.seek(0)
         result = e.returncode, t.read()
-        print result
+        print(result)
     else:
         result = 0, output
         # print('\n' + result[1])
@@ -408,7 +422,7 @@ def runcmd2(adb_cmd):
     except CalledProcessError as e:
         t.seek(0)
         result = e.returncode, t.read()
-        print result
+        print(result)
     else:
         result = 0, output
         # print('\n' + result[1])
@@ -429,9 +443,11 @@ def run_cmd_asyn(adb_cmd):
         if e != '':  # avoid items with empty string...
             final_adb_cmd.append(e)  # ... so that final command doesn't
             # contain extra spaces
-    print('\n*** Executing: ' + ' '.join(adb_cmd))
+    # print('\n*** Executing: ' + ' '.join(adb_cmd))
+    print('\n*** Executing: ' + " ".join('%s' % id for id in adb_cmd))
 
     try:
+        print(final_adb_cmd)
         p = subprocess.Popen(final_adb_cmd, stdout=subprocess.PIPE, shell=False)
         # s = p.stdout.read()
         # p.stdout.close()
@@ -479,8 +495,8 @@ def runcmd2file(adb_cmd, dest_file_handler):
 返回桌面全路径，末尾带\
 from win32com.shell import shell
 from win32com.shell import shellcon
-'''
-def getdesktoppath():
+
+def get_desktop_path():
     result = None
     try:
         from win32com.shell import shell
@@ -494,15 +510,27 @@ def getdesktoppath():
         print msg
         result = None
     return result
+'''
 
-# 返回当前脚本的全路径，末尾带\
+# 返回桌面全路径，末尾不带\
+def get_desktop_path():
+    import _winreg
+    key = _winreg.OpenKey(_winreg.HKEY_CURRENT_USER, r'Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders',)
+    return _winreg.QueryValueEx(key, "Desktop")[0]
+
+# 返回当前脚本的全路径，末尾不带\
+# 在使用os.path.join函数时，后面的路径也不能以\开头，例如：
+# os.path.join(getthispath(), 'tools\\tools.exe') ok
+# os.path.join(getthispath(), '\\tools\\tools.exe') not ok
+# 或者直接调用os.path.abspath(os.path.dirname(__file__))，例如在F:\osopen\studypython\Main.py中调用
+# 则返回F:\osopen\studypython（末尾不带\）；若调用os.path.dirname(__file__)则返回F:/osopen/studypython（末尾不带\）
 def getthispath():
     path = sys.path[0]
     #判断为脚本文件还是py2exe编译后的文件，如果是脚本文件，则返回的是脚本的目录，如果是py2exe编译后的文件，则返回的是编译后的文件路径
     if os.path.isdir(path):
-        return path + os.sep
+        return path
     elif os.path.isfile(path):
-        return os.path.split(path)[0] + os.sep
+        return os.path.split(path)[0]
 
 # 获取路径的父目录，末尾不带\
 def getparent(filepath):
@@ -526,11 +554,11 @@ def getdirname(filepath):
     else:
         return os.path.split(lsPath[0])[1]
 
-# 获取文件名及其扩展名
-def getnameandext(filename):
-    (filepath, tempfilename) = os.path.split(filename)
-    (shotname, ext) = os.path.splitext(tempfilename)
-    return shotname, ext
+# 获取文件的目录、名称、扩展名
+def get_dir_name_ext(filen_path):
+    (dir, file_name) = os.path.split(filen_path)
+    (name, ext) = os.path.splitext(file_name)
+    return dir, name, ext
 
 # 获取一个文件的大小
 def getfilesize(f):
@@ -545,7 +573,7 @@ def read(filename, binary=True):
         with open(filename, 'rb' if binary else 'r') as f:
             return f.read()
     except Exception as e:
-        print e
+        print(e)
         return None
 
 def write(filename, buf, binary=True):
@@ -553,10 +581,10 @@ def write(filename, buf, binary=True):
         with open(filename, 'wb' if binary else 'w') as f:
             return f.write(buf)
     except Exception as e:
-        print e
+        print(e)
         return None
 
-# 创建多级目录，比如c:\\test1\\test2,如果test1 test2都不存在，都将被创建
+#os.makedirs 创建多级目录，比如c:\\test1\\test2,如果test1 test2都不存在，都将被创建
 def createdirs(to_create_path):
     path_create = to_create_path
     if os.sep == '\\':
@@ -582,7 +610,7 @@ def deletedirs(to_del_dirs):
 
 # 目录下文件大小累加
 def getdirsize(path):
-    size = 0L
+    size = 0    # 0L
     for root, dirs, files in os.walk(path, True):
         size += sum([os.path.getsize(os.path.join(root, name)) for name in files])
         return size
@@ -625,7 +653,7 @@ def getfilenamelistformdir(path, endstringlist):
             for f in flist:
                 if os.path.splitext(f)[1].lower() in endstringlist:
                     retlist.append(f)
-    except Exception, e:
+    except Exception as e:
         logging.error(u"[getFileListFormDir] 获取特定后缀名%s的文件失败，路径:%s", str(endstringlist), path)
         return []
     return retlist
@@ -639,7 +667,7 @@ def getfilelistfromdir(rootPath, endstring):
                 lowerName = name.lower()
                 if lowerName.endswith(endstring):
                     fileList.append(os.path.join(root, name))
-    except Exception, e:
+    except Exception as e:
         logging.error(u"[getFileListFromDir] 从目录%s获取特定后缀名%s的文件失败", rootPath, endstring)
         return []
     return fileList
@@ -680,11 +708,14 @@ def utf82gbk(s):
 def gethtml(url, decode = True):
     html = requests.get(url)
     # print html.encoding
+
     if decode is True:
         s = html.text.encode(html.encoding)
     else:
         s = html.text
     # s = BeautifulSoup(s, "lxml")
+
+    s = s.decode(html.encoding) # Python3添加，转换为Unicode
     return s
 
 #简单的爬虫脚本，用来爬取网页gethtmlex('xxxxx', {'ip': '8.8.8.8'})
@@ -722,6 +753,27 @@ def fetchurl(url):
         # print "NOT OK:%s"%(url)
         return None
 
+
+# 下载文件
+def download_file(url, file):
+    if url.find('http') < 0:
+        url = 'http:' + url
+    else:
+        url = url.replace('https:', 'http:')
+    print(url)
+    urllib.request.urlretrieve(url, file)
+
+
+# 下载图片到本地
+def download_images(photos=[]):
+    save_dir = get_desktop_path() + '/images/'
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+
+    # downloads
+    for url in photos:
+        download_file(url, save_dir + os.path.basename(url))
+
 # 下载网页源码到本地文件
 def download(url, f):
     filename = None
@@ -729,7 +781,7 @@ def download(url, f):
         filename = urllib.urlretrieve(url, filename = f)
         # print filename[0], filename[1]
     except Exception as e:
-        print 'except: ' + e.message
+        print('except: ' + e.message)
         filename = None
     return filename
 
@@ -765,7 +817,7 @@ def postdata(url, data, headers = None, isdecode = False):
     h = headers
     if h is None:
         h = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/38.0.2125.122 Safari/537.36'}
-    cj = cookielib.CookieJar()
+    cj = http.cookiejar.CookieJar() # cookielib.CookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
     req = urllib2.Request(url, post_data, h)
     response = opener.open(req)
@@ -775,13 +827,81 @@ def postdata(url, data, headers = None, isdecode = False):
     if isdecode is True:
         content = gzipdecode(content)
     return content
+
+
+'''
+import sqlite3
+import cookielib
+import urllib2
+import os,sys
+import win32crypt
+
+def build_opener_with_chrome_cookies(domain=None):
+    cookie_file_path = os.path.join(os.environ['LOCALAPPDATA'], 'Google/Chrome/User Data/Default/Cookies')
+    if not os.path.exists(cookie_file_path):
+        raise Exception('Cookies file not exist!')
+    conn = sqlite3.connect(cookie_file_path)
+    # sql = 'select host_key, name, value, path from cookies'
+    sql="select host_key,name,encrypted_value,path from cookies";
+    if domain:
+        sql += ' where host_key like "%{}%";'.format(domain)
+
+    cookie_jar = cookielib.CookieJar()  # No cookies stored yet
+
+    for row in conn.execute(sql):
+        pwd_hash = str(row[2])
+        try:
+            ret = win32crypt.CryptUnprotectData(pwd_hash, None, None, None, 0)
+        except:
+            print 'Fail to decrypt chrome cookies'
+            sys.exit(-1)
+
+        cookie_item = cookielib.Cookie(
+            version=0, name=row[1], value=ret[1],
+            port=None, port_specified=None,
+            domain=row[0], domain_specified=None, domain_initial_dot=None,
+            path=row[3], path_specified=None,
+            secure=None,
+            expires=None,
+            discard=None,
+            comment=None,
+            comment_url=None,
+            rest=None,
+            rfc2109=False,
+        )
+        cookie_jar.set_cookie(cookie_item)  # Apply each cookie_item to cookie_jar
+    conn.close()
+    proxy = {'http':'27.24.163.155:10'}
+    # Return opener
+    return urllib2.build_opener(urllib2.ProxyHandler(proxy),urllib2.HTTPCookieProcessor(cookie_jar))
+
+
+def get_page_content_1(url):
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6',
+    }
+    opener = build_opener_with_chrome_cookies(domain='1688.com')
+    req = urllib2.Request(url, headers=headers)
+    page_content = opener.open(req).read()
+    return page_content
+
+###################################################
+
+import requests
+import browsercookie
+
+def get_page_content_2(url):
+    cj = browsercookie.chrome()
+    page = requests.get(url, cookies=cj)
+    return page.content
+'''
 ###################################################
 '''
 加解密
 '''
 ###################################################
 #  生成随机密码
-def genpasswd(length=8, chars = string.letters + string.digits):
+def genpasswd(length=8, chars = string.ascii_letters + string.digits):
     return ''.join([choice(chars) for i in range(length)])
 
 # 计算字符串的MD5值，返回32个字符长度小写16进制符号

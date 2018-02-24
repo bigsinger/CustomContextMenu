@@ -41,11 +41,9 @@ class ADBManager:
         self._deviceSelected = None
         self._devices = None  # {[0].name = "", [0].info = "", }
         self.get_devices()
-        self.is_no_devices = False
         if len(self._devices) == 1:
             self.select(0)
         elif len(self._devices) == 0:
-            self.is_no_devices = True
             print "no devices"
 
     def get_version(self):
