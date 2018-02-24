@@ -15,30 +15,30 @@ import shutil
 import traceback
 import zipfile
 import ZipManager
-from cStringIO import StringIO
+from io import StringIO
 
 plug_path = os.path.dirname(sys.argv[0])
 sys.path.append(os.path.dirname(plug_path))
 
 try:
-    import win32con
-    import win32clipboard
-    from PIL import Image
     from third_part.lib_star import star
     from third_part.lib_star.APK import APK
     from third_part.lib_star.AXMLPrinter import *
     from third_part.lib_star.ADBManager import ADBManager
-    from PathManager import *
     from Constant import Constant
+    from PathManager import PathManager
     from xml.dom import minidom
     from ApkDetect import ApkDetect
+    import win32con
+    import win32clipboard
+    from PIL import Image
 except Exception as e:
     # 执行3方库安装命令
     print(u"检测到所需的三方库未安装，已自动执行安装命令，如果仍然缺失某些三方库，请手动检查安装")
+    print(traceback.format_exc())
     require_libs_path = PathManager.get_require_txt_path()
     cmd = ['pip', 'install', '-r', require_libs_path]
     star.runcmd2(cmd)
-    print(traceback.format_exc())
     os.system('pause')
 
 DEBUG = False
