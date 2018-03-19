@@ -16,7 +16,7 @@ import shutil
 import traceback
 import zipfile
 import ZipManager
-from io import StringIO
+# from io import StringIO
 
 plug_path = os.path.dirname(sys.argv[0])
 sys.path.append(os.path.dirname(plug_path))
@@ -473,7 +473,7 @@ def viewphone(f):
 # 截屏之后图片自动保存至系统剪贴板，可直接粘贴使用
 def photo(file_path):
     adb = ADBManager()
-    if len(adb.get_devices()) == 0:
+    if adb.is_no_device():
         print(u"该功能需要连接手机或者模拟器，请确保手机或者模拟器已经启动")
         return -1, None
     # 此处要注意从配置文件中读取出来的数值属于字符串类型，需要转换为数值类型
@@ -481,14 +481,14 @@ def photo(file_path):
     if not scale:  # 如果配置文件未设置Scale字段
         scale = 0.5
     image_file = os.path.splitext(file_path)[0] + '.png'
-
+    print(image_file)
     adb.get_screenshot(image_file, scale)
     # 将图片复制到剪贴板需要先将图片数据写到内存中
-    image = Image.open(image_file)
-    output = io.BytesIO()
-    image.convert("RGB").save(output, "BMP")
-    data = output.getvalue()[14:]
-    output.close()
+    # image = Image.open(image_file)
+    # output = io.BytesIO()
+    # image.convert("RGB").save(output, "BMP")
+    # data = output.getvalue()[14:]
+    # output.close()
     # win32clipboard.OpenClipboard()
     # win32clipboard.EmptyClipboard()
     # win32clipboard.SetClipboardData(win32con.CF_DIB, data)
