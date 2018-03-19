@@ -7,6 +7,7 @@
 
 author: bigsing
 '''
+import io
 import json
 import os
 import re
@@ -21,25 +22,24 @@ plug_path = os.path.dirname(sys.argv[0])
 sys.path.append(os.path.dirname(plug_path))
 
 try:
-    from third_part.lib_star import star
-    from third_part.lib_star.APK import APK
-    from third_part.lib_star.AXMLPrinter import *
-    from third_part.lib_star.ADBManager import ADBManager
+    import star
+    from star.APK import APK
+    from star.AXMLPrinter import *
+    from star.ADBManager import ADBManager
     from Constant import Constant
     from PathManager import PathManager
     from xml.dom import minidom
     from ApkDetect import ApkDetect
     import Utils
     import win32con
-    import win32clipboard
     from PIL import Image
 except Exception as e:
     # 执行3方库安装命令
     print(u"检测到所需的三方库未安装，已自动执行安装命令，如果仍然缺失某些三方库，请手动检查安装")
     print(traceback.format_exc())
-    require_libs_path = PathManager.get_require_txt_path()
-    cmd = ['pip', 'install', '-r', require_libs_path]
-    star.runcmd2(cmd)
+    # require_libs_path = PathManager.get_require_txt_path()
+    # cmd = ['pip', 'install', '-r', require_libs_path]
+    # star.runcmd2(cmd)
     os.system('pause')
 
 DEBUG = False
@@ -71,8 +71,9 @@ def on_command(params):
     if paramCount > 3:
         isMultiFiles = True
     if sys.platform == 'win32':
+        pass
         # win下命令行参数为gbk编码，转换为UNICODE
-        filesSelected = filesSelected.decode('gbk', 'ignore')
+        # filesSelected = filesSelected.decode('gbk', 'ignore')
     print(str(paramCount) + ' ' + CMD_STR + ' ' + filesSelected)
 
     if CMD_STR == 'dex2jar':
@@ -101,7 +102,6 @@ def on_command(params):
             os.system('pause')
     elif CMD_STR == 'photo':
         ret, msg = photo(filesSelected)
-        os.system('pause')
     elif CMD_STR == 'icon':
         ret, msg = extracticon(filesSelected)
         os.system('pause')
@@ -126,25 +126,25 @@ def on_command(params):
         os.system('pause')
         # star.runcmd2([PathManager.get_about_path()])
     elif CMD_STR == 'notepad':
-        ret, msg = star.run_cmd_asyn(['notepad', star.unicode2gbk(filesSelected)])
+        ret, msg = star.run_cmd_asyn(['notepad', filesSelected])
     elif CMD_STR == 'hex':
         print('open with hex tool')
         tool = PathManager.get_hextool_path()
-        ret, msg = star.run_cmd_asyn([star.unicode2gbk(tool), star.unicode2gbk(filesSelected)])
+        ret, msg = star.run_cmd_asyn([tool, filesSelected])
     elif CMD_STR == 'lua':
         print('open with Lua Editor')
         tool = PathManager.get_luaeditor_path()
-        ret, msg = star.run_cmd_asyn([star.unicode2gbk(tool), star.unicode2gbk(filesSelected)])
+        ret, msg = star.run_cmd_asyn([tool, filesSelected])
     elif CMD_STR == 'luyten':
         print('open with luyten')
         tool = PathManager.get_luyten_path()
-        ret, msg = star.run_cmd_asyn([star.unicode2gbk(tool), star.unicode2gbk(filesSelected)])
+        ret, msg = star.run_cmd_asyn([tool, filesSelected])
         if ret != 0:  # 说明此时执行命令出错，暂停下让用户能够看到cmd窗口的出错信息
             os.system('pause')
     elif CMD_STR == 'jdgui':
         print('open with jdgui')
         tool = PathManager.get_jdgui_path()
-        ret, msg = star.run_cmd_asyn([star.unicode2gbk(tool), star.unicode2gbk(filesSelected)])
+        ret, msg = star.run_cmd_asyn([tool, filesSelected])
     elif CMD_STR == 'md5':
         ret, msg = md5(filesSelected)
         os.system('pause')
@@ -170,17 +170,20 @@ def plug_get_neprotect_ver(apk_path):
 
 
 def md5(apk_file):
-    if not apk_file.endswith('.apk'):
-        print(u"该文件不是apk文件，请选择一个apk文件")
-        return None, None
-    else:
-        cmd = Constant.KEYTOOL_FILENAME + ' -printcert' + ' -jarfile ' + apk_file
-        result = os.popen(cmd)
-        for line in result.readlines():
-            if "MD5" in line:
-                print(line)
-                return line, None
-        return None, None
+    # 这里是获取文件MD5值，请补充todo
+    pass
+    return None, None
+    # if not apk_file.endswith('.apk'):
+    #     print(u"该文件不是apk文件，请选择一个apk文件")
+    #     return None, None
+    # else:
+    #     cmd = Constant.KEYTOOL_FILENAME + ' -printcert' + ' -jarfile ' + apk_file
+    #     result = os.popen(cmd)
+    #     for line in result.readlines():
+    #         if "MD5" in line:
+    #             print(line)
+    #             return line, None
+    #     return None, None
 
 
 # 支持APK、DEX转换为Jar，
@@ -472,7 +475,7 @@ def photo(file_path):
     adb = ADBManager()
     if len(adb.get_devices()) == 0:
         print(u"该功能需要连接手机或者模拟器，请确保手机或者模拟器已经启动")
-        return 0, None
+        return -1, None
     # 此处要注意从配置文件中读取出来的数值属于字符串类型，需要转换为数值类型
     scale = float(Utils.get_value_from_confing('ScaleSize', 'Scale'))
     if not scale:  # 如果配置文件未设置Scale字段
@@ -482,15 +485,15 @@ def photo(file_path):
     adb.get_screenshot(image_file, scale)
     # 将图片复制到剪贴板需要先将图片数据写到内存中
     image = Image.open(image_file)
-    output = StringIO()
+    output = io.BytesIO()
     image.convert("RGB").save(output, "BMP")
     data = output.getvalue()[14:]
     output.close()
-    win32clipboard.OpenClipboard()
-    win32clipboard.EmptyClipboard()
-    win32clipboard.SetClipboardData(win32con.CF_DIB, data)
-    win32clipboard.CloseClipboard()
-    print(u'图片已经复制到了剪贴板，您可直接粘贴使用')
+    # win32clipboard.OpenClipboard()
+    # win32clipboard.EmptyClipboard()
+    # win32clipboard.SetClipboardData(win32con.CF_DIB, data)
+    # win32clipboard.CloseClipboard()
+    # print(u'图片已经复制到了剪贴板，您可直接粘贴使用')
     return 0, None
 
 
@@ -562,20 +565,49 @@ def check_and_installed_third_part():
     pass
 
 
+'''
+需要处理命令tag参见../menu.xml配置文件里的菜单tag项。
+调试时，开启DEBUG开关，传递相应的参数调用。
+调试通过后，关闭DEBUG开关，使用右键菜单项触发。
+'''
 if __name__ == '__main__':
     ret = 0
     msg = None
     check_and_installed_third_part()
     try:
         if DEBUG:
-            ret, msg = on_command([__file__, 'installd', os.path.join(Utils.get_desktop_path(), 'nfcard.apk')])
+            test_path = Utils.get_desktop_path()
+            # ret, msg = on_command([__file__, 'notepad', os.path.join(test_path, 'test.apk')])
+            # ret, msg = on_command([__file__, 'hex', os.path.join(test_path, 'test.apk')])
+            # ret, msg = on_command([__file__, 'lua', os.path.join(test_path, 'test.apk')])
+            # ret, msg = on_command([__file__, 'md5', os.path.join(test_path, 'test.apk')])
+            # ret, msg = on_command([__file__, 'jdgui', os.path.join(test_path, 'test.jar')])
+            # ret, msg = on_command([__file__, 'luyten', os.path.join(test_path, 'test.jar')])
+            # ret, msg = on_command([__file__, 'dex2jar', os.path.join(test_path, 'test.apk')])
+            # ret, msg = on_command([__file__, 'axml2txt', os.path.join(test_path, 'test.apk')])
+            # ret, msg = on_command([__file__, 'viewapk', os.path.join(test_path, 'test.apk')])
+            # ret, msg = on_command([__file__, 'viewsign', os.path.join(test_path, 'test.apk')])
+            # ret, msg = on_command([__file__, 'sign', os.path.join(test_path, 'test.apk')])
+            # ret, msg = on_command([__file__, 'sign_v1_v2', os.path.join(test_path, 'test.apk')])
+            # ret, msg = on_command([__file__, 'installd', os.path.join(test_path, 'test.apk')])
+            # ret, msg = on_command([__file__, 'installr', os.path.join(test_path, 'test.apk')])
+            # ret, msg = on_command([__file__, 'uninstall', os.path.join(test_path, 'test.apk')])
+            # ret, msg = on_command([__file__, 'viewwrapper', os.path.join(test_path, 'test.apk')])
+            # ret, msg = on_command([__file__, 'phone', os.path.join(test_path, '')])
+            # ret, msg = on_command([__file__, 'photo', os.path.join(test_path, '')])
+            # ret, msg = on_command([__file__, 'icon', os.path.join(test_path, 'test.apk')])
+            # ret, msg = on_command([__file__, 'zipalign', os.path.join(test_path, 'test.apk')])
+            # ret, msg = on_command([__file__, 'baksmali', os.path.join(test_path, 'test.apk')])
+            # ret, msg = on_command([__file__, 'smali', os.path.join(test_path, 'test')])
+            # ret, msg = on_command([__file__, 'plug_get_neprotect_ver', os.path.join(test_path, 'test.apk')])
+            pass
         else:
             ret, msg = on_command(sys.argv)
         if ret != 0 and ret is not None:
             print(msg)
-            os.system('pause')
+            os.system('pause')  # 出错时卡住，方便查看出错信息
     except Exception as e:
         print(traceback.format_exc())
-        os.system('pause')
+        os.system('pause')      # 出错时卡住，方便查看出错信息
     if not ret:
         sys.exit(-1)

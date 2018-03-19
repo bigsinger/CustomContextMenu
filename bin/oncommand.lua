@@ -11,7 +11,7 @@ function main(thispath, cmdid, cmdname, file, isMultiFiles)
 		cmds = cmds..' '..isMultiFiles
 	end
 	os.execute(cmds)
-	os.execute('pause')
+	--os.execute('pause')
 	return 1
 end
 

@@ -5,9 +5,6 @@ import zipfile
 import sys
 from zipmgr import zipmgr
 
-reload(sys)
-sys.setdefaultencoding('gbk')
-
 
 class ApkDetect:
     def __init__(self, dit):
