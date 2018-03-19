@@ -399,10 +399,19 @@ def checkIsInstalledSuccess(msg):
         os.system('pause')
 
 
+# 获取包名
+def get_package(f):
+    retcode, msg = star.runcmd2([PathManager.get_aapt_path(), 'dump', 'badging', f])
+    if retcode == 0:
+        package = star.find("package: name='(.*?)'", msg)
+    return package
+
+
 # 卸载安装
 def installd(f):
-    apk = APK(f)
-    package = apk.get_package()
+    # apk = APK(f)
+    # package = apk.get_package()
+    package = get_package(f)
     adb = ADBManager()
     adb.uninstall(package)
     code, msg = adb.install(f)
@@ -420,8 +429,9 @@ def installr(f):
 
 # 卸载应用
 def uninstall(f):
-    apk = APK(f)
-    package = apk.get_package()
+    # apk = APK(f)
+    # package = apk.get_package()
+    package = get_package(f)
     adb = ADBManager()
     adb.uninstall(package)
     return 0, None
