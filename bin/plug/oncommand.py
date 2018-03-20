@@ -122,7 +122,7 @@ def on_command(params):
     elif CMD_STR == 'plug3':
         ret, msg = plug(filesSelected)
     elif CMD_STR == 'about':
-        print(u'右键工具v3.0 by bising')
+        print(u'\n\n右键工具v3.0 by bising（https://github.com/bigsinger）\n\n')
         os.system('pause')
         # star.runcmd2([PathManager.get_about_path()])
     elif CMD_STR == 'notepad':
@@ -149,7 +149,7 @@ def on_command(params):
         ret, msg = md5(filesSelected)
         os.system('pause')
     else:
-        return -1, u'未实现命令：' + CMD_STR + u'请检查您输入的命令是否正确'
+        return -1, u'\n\n未实现命令：' + CMD_STR + u'请检查您输入的命令是否正确\n\n'
     return ret, msg
 
 

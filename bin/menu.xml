@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0"?>
 <menu name="右键增强工具" icon="icon\logo.png">
   <menu name="复制路径" icon="icon\copypath.png" tag="copypath"/>
+  <menu name="获取树形目录结构" icon="icon\tree.png" tag="tree"/>
   <menu name="记事本打开" icon="icon\notepad.png" tag="notepad"/>
   <menu name="WinHex打开" icon="icon\hex.png" tag="hex"/>
   <menu name="LuaEditor打开" icon="icon\lua.png" tag="lua"/>
