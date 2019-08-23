@@ -22,8 +22,17 @@ plug_path = os.path.dirname(sys.argv[0])
 sys.path.append(os.path.dirname(plug_path))
 
 try:
-    ... #import xxx
-    ...
+    import star
+    from star.APK import APK
+    from star.AXMLPrinter import *
+    from star.ADBManager import ADBManager
+    from Constant import Constant
+    from PathManager import PathManager
+    from xml.dom import minidom
+    from ApkDetect import ApkDetect
+    import Utils
+    import win32con
+    from PIL import Image
 except Exception as e:
     # 执行3方库安装命令
     print(u"检测到所需的三方库未安装，已自动执行安装命令，如果仍然缺失某些三方库，请手动检查安装")
