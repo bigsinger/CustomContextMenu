@@ -96,7 +96,7 @@
     </menu>
     ```
 
-    调用的参数序列为：调用的参数序列为：**runlua.exe oncommand.lua tag file [files]**
+    调用的参数序列为：调用的参数序列为：**runlua.exe oncommand.py tag file [files]**
 
     
 
