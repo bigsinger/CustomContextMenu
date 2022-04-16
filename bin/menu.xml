@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu name="安卓右键工具" icon="icon\logo.png" apptype="0" debug="0">
+<menu name="安卓右键工具" icon="icon\logo.png" run="..\..\APKInfo\APKInfo\bin\APKInfo.exe" debug="0">
   <menu name="复制路径" icon="icon\copypath.png" tag="copypath"/>
   <menu name="DEX 》JAR" icon="icon\dex2jar.png" tag="dex2jar"/>
   <menu name="Manifest 》TXT | AXML 》TXT" icon="icon\m2txt.png" tag="axml2txt"/>
