@@ -21,29 +21,30 @@
 ```xml
 <?xml version="1.0"?>
 <menu name="安卓右键工具" icon="icon\logo.png" run="..\..\APKInfo\APKInfo\bin\APKInfo.exe" debug="0">
-  <menu name="复制路径" icon="icon\copypath.png" arg="{0} copypath"/>
-  <menu name="DEX 》JAR" icon="icon\dex2jar.png" arg="{0} dex2jar"/>
-  <menu name="Manifest 》TXT | AXML 》TXT" icon="icon\m2txt.png" arg="{0} axml2txt"/>
-  <menu name="查看APK信息" icon="icon\apkinfo.png" arg="{0} viewapk"/>
-  <menu name="查看签名信息" icon="icon\signinfo.png" arg="{0} viewsign"/>
-  <menu name="签名" arg="{0} sign" icon="icon\sign.png"/>
+  <menu name="复制路径" icon="icon\copypath.png" arg="{1} copypath"/>
+  <menu name="DEX 》JAR" icon="icon\dex2jar.png" arg="{1} dex2jar"/>
+  <menu name="Manifest 》TXT | AXML 》TXT" icon="icon\m2txt.png" arg="{1} axml2txt"/>
+  <menu name="查看APK信息" icon="icon\apkinfo.png" arg="{1} viewapk"/>
+  <menu name="查看签名信息" icon="icon\signinfo.png" arg="{1} viewsign"/>
+  <menu name="签名" arg="{1} sign" icon="icon\sign.png"/>
   <menu/>
-  <menu name="安装（卸载安装）" icon="icon\install.png" arg="{0} installd"/>
-  <menu name="安装（替换安装）" icon="icon\installr.png" arg="{0} installr"/>
-  <menu name="卸载" icon="icon\uninstall.png" arg="{0} uninstall"/>
-  <menu name="查壳" icon="icon\detect.png" arg="{0} viewwrapper"/>
-  <menu name="手机信息" icon="icon\phone.png" arg="{0} phone"/>
-  <menu name="手机截图" icon="icon\photo.png" arg="{0} photo"/>
-  <menu name="提取图标" icon="icon\extracticon.png" arg="{0} icon"/>
-  <menu name="zipalign优化" icon="icon\align.png" arg="{0} zipalign"/>
-  <menu name="反编译" icon="icon\decom.png" arg="{0} baksmali"/>
-  <menu name="回编译" icon="icon\build.png" arg="{0} smali"/>
+  <menu name="安装（卸载安装）" icon="icon\install.png" arg="{1} installd"/>
+  <menu name="安装（替换安装）" icon="icon\installr.png" arg="{1} installr"/>
+  <menu name="卸载" icon="icon\uninstall.png" arg="{1} uninstall"/>
+  <menu name="查壳" icon="icon\detect.png" arg="{1} viewwrapper"/>
+  <menu name="手机信息" icon="icon\phone.png" arg="{1} phone"/>
+  <menu name="手机截图" icon="icon\photo.png" arg="{1} photo"/>
+  <menu name="提取图标" icon="icon\extracticon.png" arg="{1} icon"/>
+  <menu name="zipalign优化" icon="icon\align.png" arg="{1} zipalign"/>
+  <menu name="反编译" icon="icon\decom.png" arg="{1} baksmali"/>
+  <menu name="回编译" icon="icon\build.png" arg="{1} smali"/>
   <menu name="自定义插件" icon="icon\plug.png">
-    <menu name="插件1" arg="{0} plug1"/>
-    <menu name="插件2" arg="{0} plug2"/>
-    <menu name="插件3" arg="{0} plug3"/>
+    <menu name="插件1" arg="{1} plug1"/>
+    <menu name="插件2" arg="{1} plug2"/>
+    <menu name="插件3" arg="{1} plug3"/>
   </menu>
-  <menu name="关于" icon="icon\about.png" arg="{0} about"/>
+  <menu name="打开插件安装目录" icon="icon\plug.png" arg="{0} open"/>
+  <menu name="关于" icon="icon\about.png" arg="{1} about"/>
 </menu>
 ```
 ## 根菜单说明
@@ -123,7 +124,7 @@
 
 - icon指示了菜单项的图标文件，以相对路径填写，相对于DLL的所在目录。例如：icon\logo.png，若不填写或者指示的图标文件不存在或者加载失败，则条菜单项前面不会出现图标，问题不大。为了加快菜单的加载速度，也可以全部不配置图标文件。
 - run：可选，表示用户点击了子菜单命令后需要调用的三方应用，路径支持绝对路径和相对路径，使用相对路径时是以DLL的所在目录为准。该属性为有可继承属性，如果当前子节点未设置该属性，则使用父级节点的该属性值。见根菜单中对应run属性的说明。
-- arg：如果该项菜单没有子菜单，也不是分隔条，那么就要响应事件，则arg指示了响应的事件名称，最终会被传递到三方程序中。以**{0}**表示待处理的文件名。
+- arg：如果该项菜单没有子菜单，也不是分隔条，那么就要响应事件，则arg指示了响应的事件名称，最终会被传递到三方程序中。以**{1}**表示待处理的文件名，**{0}**表示本插件的安装目录路径。
 - 如果菜单含有子菜单项，则按示例menu.xml添加即可。最多支持二级菜单项，不支持更深层次的子菜单。
 
 ## 效果截图
