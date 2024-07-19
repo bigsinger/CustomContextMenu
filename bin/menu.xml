@@ -1,32 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu name="安卓右键工具" icon="icon\logo.png" run="..\..\APKInfo\APKInfo\bin\APKInfo.exe" debug="0">
-  <menu name="复制路径" icon="icon\copypath.png" tag="copypath"/>
-  <menu name="DEX 》JAR" icon="icon\dex2jar.png" tag="dex2jar"/>
-  <menu name="Manifest 》TXT | AXML 》TXT" icon="icon\m2txt.png" tag="axml2txt"/>
-  <menu name="查看APK信息" icon="icon\apkinfo.png" tag="viewapk"/>
-  <menu name="查看签名信息" icon="icon\signinfo.png" tag="viewsign"/>
-  <menu name="签名" tag="sign" icon="icon\sign.png"/>
-  <menu/>
-  <menu name="安装（卸载安装）" icon="icon\install.png" tag="installd"/>
-  <menu name="安装（替换安装）" icon="icon\install.png" tag="installr"/>
-  <menu name="卸载" icon="icon\uninstall.png" tag="uninstall"/>
-  <menu name="查壳" icon="icon\detect.png" tag="viewwrapper"/>
-  <menu name="手机信息" icon="icon\phone.png" tag="phone"/>
-  <menu name="手机截图" icon="icon\photo.png" tag="photo"/>
-  <menu name="提取图标" icon="icon\extracticon.png" tag="icon"/>
-  <menu name="zipalign优化" icon="icon\align.png" tag="zipalign"/>
-  <menu name="反编译" icon="icon\decom.png" tag="baksmali"/>
-  <menu name="回编译" icon="icon\build.png" tag="smali"/>
-  <menu name="自定义插件" icon="icon\plug.png">
-    <menu name="插件1" tag="plug1" icon="icon\1.png"/>
-    <menu name="插件2" tag="plug2" icon="icon\2.png"/>
-    <menu name="插件3" tag="plug3" icon="icon\3.png"/>
-    <menu name="插件4" tag="plug4" icon="icon\4.png"/>
-    <menu name="插件5" tag="plug5" icon="icon\5.png"/>
-    <menu name="插件6" tag="plug6" icon="icon\6.png"/>
-    <menu name="插件7" tag="plug7" icon="icon\7.png"/>
-    <menu name="插件8" tag="plug8" icon="icon\8.png"/>
-    <menu name="插件9" tag="plug9" icon="icon\9.png"/>
+<menu name="安卓右键工具me" icon="icon\logo.png" run="..\..\APKInfo\APKInfo\bin\APKInfo.exe" debug="0">
+  <menu name="复制路径" icon="icon\copy.png" arg="-i {1} -c copypath"/>
+  <menu name="记事本打开" icon="icon\notepad.png" run="notepad" arg="{1}"/>
+  <menu name="文件信息" icon="icon\detect.png" arg="-i {1} -c apkinfo"/>
+  <menu name="查壳" icon="icon\shield.png" arg="-i {1} -c scanshell"/>
+  <menu name="DEX -> JAR" icon="icon\java.png" arg="-i {1} -c dex2jar"/>
+  <menu name="Manifest修复" icon="icon\fix.png" run="script\fixAXML\main.py" arg="{1}"/>
+  <menu name="Manifest ->TXT | AXML -> TXT" icon="icon\txt.png" arg="-i {1} -c axml2txt"/>
+  <menu name="aapt dump xmltree AndroidManifest" icon="icon\txt.png" run="cmd" arg="/c {0}..\..\APKInfo\APKInfo\bin\tool\aapt.exe dump xmltree -i {1} -c AndroidManifest.xml > {path}AndroidManifest.txt"/>
+  <menu name="AXML -> XML" icon="icon\txt.png" run="..\..\APKInfo\APKInfo\bin\tool\xml2axml-2.0.1.jar" arg="d -i {1} -c {path}{name}.txt"/>
+  <menu name="XML -> AXML" icon="icon\xml.png" run="..\..\APKInfo\APKInfo\bin\tool\xml2axml-2.0.1.jar" arg="e -i {1} -c {path}{name}.axml"/>
+  <menu name="jadx查看源码" icon="icon\java.png" run="..\..\APKInfo\APKInfo\bin\tool\jadx\jadx-gui-1.5.0.exe" arg="{1}"/>
+  <menu name="jd-gui查看源码" icon="icon\java.png" run="..\..\APKInfo\APKInfo\bin\tool\jdgui\jd-gui.exe" arg="{1}"/>
+  <menu name="DEX信息" icon="" arg="-i {1} -c dex"/>
+  <menu name="字符串资源arsc" icon="icon\strings.png" arg="-i {1} -c arsc"/>
+  <menu name="SDK信息" icon="" arg="-i {1} -c sdk"/>
+  <menu name="SO信息" icon="icon\binary.png" arg="-i {1} -c so"/>
+  <menu name="签名" icon="icon\sign.png">
+	  <menu name="debug签名(apksigner)" arg="-i {1} -c sign" icon="icon\sign.png"/>
+	  <menu name="配置签名(apksigner)" arg="-i {1} -c config_sign" icon="icon\sign.png"/>
+	  <menu name="配置签名(jarsigner)" arg="-i {1} -c jar_sign" icon="icon\sign.png"/>
+	  <menu/>
+	  <menu name="创建新的签名" run="keytool" arg="-genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000" icon="icon\add.png"/>
   </menu>
-  <menu name="关于" icon="icon\about.png" tag="about"/>
+  <menu/>
+  <menu name="adb替换安装" icon="icon\install.png" run="..\..\APKInfo\APKInfo\bin\tool\adb\adb.exe" arg="install -r {1}"/>
+  <menu name="adb授权安装" icon="icon\install.png" run="..\..\APKInfo\APKInfo\bin\tool\adb\adb.exe" arg="install -g {1}"/>
+  <menu name="安装运行（卸载安装）" icon="icon\install.png" arg="-i {1} -c installd"/>
+  <menu name="卸载" icon="icon\uninstall.png" arg="-i {1} -c uninstall"/>
+  <menu name="DumpScreen" icon="icon\detect.png" arg="-i {1} -c dumpscreen"/>
+  <menu name="手机信息" icon="icon\phone.png" arg="-i {1} -c phone"/>
+  <menu name="手机截图" icon="icon\photo.png" arg="-i {1} -c photo"/>
+  <menu name="zipalign" icon="icon\align.png" run="..\..\APKInfo\APKInfo\bin\tool\zipalign.exe" arg="-f -p 4 -i {1} -c {path}{name}_align{ext}"/>
+  <menu name="lib规范性检查" icon="icon\normalized.png" arg="-i {1} -c checklib"/>
+  <menu name="反编译baksmali" icon="icon\decom.png" run="..\..\APKInfo\APKInfo\bin\tool\smali\baksmali.jar" arg="d -i {1} -c -o {path}{name}"/>
+  <menu name="回编译smali" icon="icon\build.png" run="..\..\APKInfo\APKInfo\bin\tool\smali\smali.jar" arg="a -i {1} -c -o {path}{name}.dex"/>
+  <menu name="深度扫描文件" icon="icon\scan.png" arg="-i {1} -c scan"/>
+  <menu name="AAB -> APK" icon="icon\build.png" arg="-i {1} -c aab2apk"/>
+  <menu name="生成策略报告" icon="icon\build.png" arg="-i {1} -c strategy"/>
+  <menu name="性能评估" icon="icon\performance.png">
+	  <menu name="首次启动时间" icon="icon\time.png" arg="-i {1} -c cold_boot_time"/>
+	  <menu name="再次启动时间" icon="icon\time.png" arg="-i {1} -c boot_time"/>
+	  <menu name="直接启动时间(不安装)" icon="icon\time.png" arg="-i {1} -c direct_boot_time"/>
+	  <menu name="内存占用" icon="icon\performance.png" arg="-i {1} -c meminfo"/>
+	  <menu name="CPU消耗" icon="icon\performance.png" arg="-i {1} -c cpuinfo"/>
+	  <menu name="生成评估报告" icon="icon\report.png" arg="-i {1} -c generate_report"/>
+  </menu>
+  <menu name="自定义插件" icon="icon\plugin.png">
+    <menu name="插件1" arg="-i {1} -c plug1" icon="icon\1.png"/>
+    <menu name="插件2" arg="-i {1} -c plug2" icon="icon\2.png"/>
+    <menu name="插件3" arg="-i {1} -c plug3" icon="icon\3.png"/>
+    <menu name="插件4" arg="-i {1} -c plug4" icon="icon\4.png"/>
+    <menu name="插件5" arg="-i {1} -c plug5" icon="icon\5.png"/>
+    <menu name="插件6" arg="-i {1} -c plug6" icon="icon\6.png"/>
+    <menu name="插件7" arg="-i {1} -c plug7" icon="icon\7.png"/>
+    <menu name="插件8" arg="-i {1} -c plug8" icon="icon\8.png"/>
+    <menu name="插件9" arg="-i {1} -c plug9" icon="icon\9.png"/>
+  </menu>
+  <menu name="打开插件安装目录" icon="icon\folder.png" run="cmd" arg="/c start {0}"/>
+  <menu name="关于" icon="icon\about.png" arg="-i {1} -c about"/>
 </menu>
