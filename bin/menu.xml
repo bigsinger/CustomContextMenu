@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu name="安卓右键工具me" icon="icon\logo.png" run="..\..\..\osopen\APKInfo\APKInfo\bin\APKInfo.exe" debug="1">
+<menu name="安卓右键工具me" icon="icon\logo.png" run="..\..\..\osopen\APKInfo\APKInfo\bin\APKInfo.exe" debug="0">
   <menu name="复制路径" icon="icon\copy.png"/>
   <menu name="记事本打开" icon="icon\notepad.png" run="notepad" arg="{1}"/>
   <menu name="文件信息" icon="icon\detect.png" arg="-i {1} -c apkinfo"/>
