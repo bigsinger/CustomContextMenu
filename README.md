@@ -1,178 +1,141 @@
-自定义系统右键菜单工具-使用说明
+# CustomContextMenu
 
-# 安装与卸载
+## 简介
 
-- 安装：**以管理员身份运行**：`install.bat`
+CustomContextMenu 是一个 Windows 资源管理器右键菜单扩展。它把右键菜单的 Shell 扩展逻辑固定在一个轻量 DLL 中，把菜单名称、图标、子菜单和点击后执行的命令都交给 `bin/menu.xml` 配置。
 
-- 卸载：**以管理员身份运行**：`uninstall.bat`，由于是重启了`explorer.exe`，所以卸载后DLL文件可以直接删除。
-
-# 设计模式
-
-主要分为固定部分和可配置部分，固定部分主要是保持Windows Shell编程的透明，使用者无须关心右键的菜单如何创建、展示和响应的。
-
-可配置部分主要是自定义菜单和菜单的响应事件。
-
-![](./doc/design.png)
-
-# 自定义菜单配置
-
-## 菜单配置文件示例
-在 bin 目录下修改 **menu.xml**，默认给出了一个模板：
-```xml
-<?xml version="1.0"?>
-<menu name="安卓右键工具" icon="icon\logo.png" run="..\..\APKInfo\APKInfo\bin\APKInfo.exe" debug="0">
-  <menu name="复制路径" icon="icon\copypath.png" arg="{1} copypath"/>
-  <menu name="DEX 》JAR" icon="icon\dex2jar.png" arg="{1} dex2jar"/>
-  <menu name="Manifest 》TXT | AXML 》TXT" icon="icon\m2txt.png" arg="{1} axml2txt"/>
-  <menu name="查看APK信息" icon="icon\apkinfo.png" arg="{1} viewapk"/>
-  <menu name="查看签名信息" icon="icon\signinfo.png" arg="{1} viewsign"/>
-  <menu name="签名" arg="{1} sign" icon="icon\sign.png"/>
-  <menu/>
-  <menu name="安装（卸载安装）" icon="icon\install.png" arg="{1} installd"/>
-  <menu name="安装（替换安装）" icon="icon\installr.png" arg="{1} installr"/>
-  <menu name="卸载" icon="icon\uninstall.png" arg="{1} uninstall"/>
-  <menu name="查壳" icon="icon\detect.png" arg="{1} viewwrapper"/>
-  <menu name="手机信息" icon="icon\phone.png" arg="{1} phone"/>
-  <menu name="手机截图" icon="icon\photo.png" arg="{1} photo"/>
-  <menu name="提取图标" icon="icon\extracticon.png" arg="{1} icon"/>
-  <menu name="zipalign优化" icon="icon\align.png" arg="{1} zipalign"/>
-  <menu name="反编译" icon="icon\decom.png" arg="{1} baksmali"/>
-  <menu name="回编译" icon="icon\build.png" arg="{1} smali"/>
-  <menu name="自定义插件" icon="icon\plug.png">
-    <menu name="插件1" arg="{1} plug1"/>
-    <menu name="插件2" arg="{1} plug2"/>
-    <menu name="插件3" arg="{1} plug3"/>
-  </menu>
-  <menu name="打开插件安装目录" icon="icon\plug.png" arg="{0} open"/>
-  <menu name="关于" icon="icon\about.png" arg="{1} about"/>
-</menu>
-```
-## 根菜单说明
-
-- **name**：显示在系统右键菜单中的名称。
-
-- **icon**：可选，显示在系统右键菜单中的图标。
-
-- **debug**：可选，默认为"0"，调用三方应用时会以隐藏窗口模式运行，且不输出日志。设置为 "1" 时，调用三方应用以显式窗口模式运行，并可以通过**DebugView** 查看日志输出，同时本目录下会生成名为 **log.txt** 的日志文件，方便排查：
-
-  ```xml
-  <menu name="安卓右键工具" icon="icon\logo.png" debug="1">
-      ...
-  </menu>
-  ```
-
-  
-
-- **run**：可选，表示用户点击了子菜单命令后需要调用的三方应用，路径支持绝对路径和相对路径（相对于本DLL的路径）。为可继承属性，如果当前子节点未设置该属性，则使用父级节点的该属性值。目前支持以下几种扩展名路径：
-
-  - **exe**：调用exe程序：
-
-    ```xml
-    <menu name="安卓右键工具" icon="icon\logo.png" run="xxx.exe">
-        ...
-    </menu>
-    ```
-
-    调用的参数序列为：**xxx.exe arg [files]**
-
-    
-
-  - **py**：调用Python脚本：
-
-    ```xml
-    <menu name="安卓右键工具" icon="icon\logo.png" run="xxx.py">
-        ...
-    </menu>
-    ```
-
-    调用的参数序列为：**python xxx.py arg [files]**
-
-    
-
-  - **jar**：调用jar包：
-
-    ```xml
-    <menu name="安卓右键工具" icon="icon\logo.png" run="xxx.jar">
-        ...
-    </menu>
-    ```
-
-    调用的参数序列为：**java -jar xxx.jar arg [files]**
-
-    
-  
-  - lua：调用本目录下名为 **runlua.exe** 的程序执行该lua脚本文件：
-  
-    ```xml
-    <menu name="安卓右键工具" icon="icon\logo.png" run="xxx.lua">
-        ...
-    </menu>
-    ```
-  
-    调用的参数序列为：**runlua.exe xxx.lua arg [files]**
-  
-    
-
-## 子菜单说明
-
-- 最多支持二级菜单项，不支持更深层次的子菜单。如果菜单含有子菜单项，则按示例添加即可。
-- 一个菜单项四个属性，分别为**name**，**icon**，**run**和**arg**。
-- **name**：子菜单名称。如果name为空，则该菜单项为分隔条，例如配置分隔条可以这样配置：
-
-```
-<menu/>
-```
-
-- **icon**：可选，指示了菜单项的图标文件，以相对路径填写，相对于DLL的所在目录。例如：icon\logo.png，若不填写或者指示的图标文件不存在或者加载失败，则条菜单项前面不会出现图标。为了加快菜单的加载速度，也可以全部不配置图标文件。
-- **run**：可选，意义同「根菜单」里的说明。为可继承属性，如果当前子节点未设置该属性，则使用父级节点的该属性值。见根菜单中对应run属性的说明。
-- **arg**：如果该项菜单没有子菜单，也不是分隔条，那么就要响应事件，则arg指示了响应的事件名称，最终会被传递到三方程序中。支持标识符，标识符会被替换成实际的值，目前支持以下标识符：
-  - **{0}**  表示本插件的安装目录路径，末尾带斜杠。
-  - **{1}**  表示待处理的文件全路径。
-  - **{path}**  表示待处理文件的父目录路径，末尾带斜杠。
-  - **{name}**   表示待处理文件的文件名，不含扩展名。
-  - **{ext}**    表示待处理文件的扩展名，带点。
-
-
-
-
-## 效果截图
+适合把常用脚本、命令行工具、APK 分析工具、内部自动化工具或文件处理工具挂到资源管理器右键菜单里。使用者只需要修改 XML，不需要重新编译 DLL。
 
 ![](./doc/screenshot1.png)
 
+项目由两部分组成：
+
+- `bin/CustomContextMenu.dll`：注册到系统中的 Shell COM 扩展。
+- `bin/menu.xml`：菜单配置文件，定义菜单展示和点击后的执行命令。
+
+整体设计如下：
+
+![](./doc/design.png)
+
+当前实现使用纯 C 编写核心 DLL，不依赖 C++/ATL/STL。菜单 XML 使用项目内轻量解析逻辑，菜单 PNG/BMP 图标通过 Win32/GDI+ flat API 加载。
+
+## 如何使用
+
+### 安装和卸载
+
+以管理员身份打开命令行，进入 `bin` 目录：
+
+```bat
+install.bat
+```
+
+卸载：
+
+```bat
+uninstall.bat
+```
+
+卸载脚本会反注册 DLL，并重启 `explorer.exe`，因此卸载后通常可以直接删除 DLL。
+
+### 修改菜单
+
+编辑 `bin/menu.xml`。根节点定义主菜单，子节点定义一级菜单或二级菜单。
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<menu name="我的右键工具" icon="icon\logo.png" run="tools\handler.exe" debug="0">
+  <menu name="复制路径" arg="{1}"/>
+  <menu name="记事本打开" icon="icon\notepad.png" run="notepad" arg="{1}"/>
+  <menu/>
+  <menu name="图片工具" icon="icon\photo.png">
+    <menu name="压缩图片" run="tools\image-compress.exe" arg="-i {1}"/>
+    <menu name="查看目录" run="cmd" arg="/c start {path}"/>
+  </menu>
+</menu>
+```
+
+常用属性：
+
+- `name`：菜单显示名称。空的 `<menu/>` 表示分隔线。
+- `icon`：菜单图标路径，相对于 DLL 所在目录，例如 `icon\logo.png`。
+- `run`：点击菜单后执行的程序或脚本。支持绝对路径，也支持相对 DLL 目录的路径。
+- `arg`：传给 `run` 的参数。
+- `debug`：根菜单属性。设置为 `1` 时会输出 `log.txt` 并在批量处理时等待当前命令结束。
+
+`run` 支持以下类型：
+
+- `.exe` 或系统命令：直接执行。
+- `.py`：使用 `python "脚本路径"` 执行。
+- `.jar`：使用 `java -jar "jar路径"` 执行。
+- `.lua`：使用 DLL 同目录下的 `runLua.exe` 执行。
+
+`arg` 支持占位符：
+
+- `{0}`：DLL 所在目录，末尾带反斜杠。
+- `{1}`：当前选中文件或目录的完整路径。
+- `{path}`：当前选中项的父目录，末尾带反斜杠。
+- `{name}`：当前选中项文件名，不含扩展名。
+- `{ext}`：当前选中项扩展名，包含点号。
+
+路径类占位符在常见独立参数场景下会自动加引号，能处理包含空格的路径。
+
+### 使用场景
+
+开发者可以把构建、格式化、反编译、签名、日志分析等命令挂到右键菜单。例如右键 `.apk` 后执行 APK 信息查看、签名检查、反编译、zipalign 或安装到设备。
+
+测试人员可以把常用诊断动作做成菜单。例如一键抓取设备截图、导出日志、生成测试报告、打开测试数据目录。
+
+设计或运营人员可以把文件处理动作做成菜单。例如图片压缩、批量改名、复制文件路径、把素材目录交给内部上传工具。
+
+运维或支持人员可以把排障脚本做成菜单。例如对日志文件执行脱敏、提取错误码、打开关联工单页面或运行检测脚本。
+
+个人用户可以把常用程序做成自己的右键工具箱。例如用指定编辑器打开、复制 Unix 风格路径、把文件移动到归档目录、打开当前目录的命令行窗口。
+
+### 示例效果
+
 ![](./doc/screenshot2.png)
 
-## 如何响应事件
+### 配置建议
 
-点击任意菜单项后，菜单的 arg 内容会先经过标识符的替换后传递给到三方App中，具体调用哪个App取决于菜单配置文件中的 **run** 值，可以参考前面的章节以及目录下的示例脚本。
+`menu.xml` 使用 UTF-8 编码保存。
 
+优先给 `run` 写明确路径。相对路径会按 DLL 所在目录解析，适合把工具和 DLL 放在同一个 `bin` 目录下分发。
 
+调用 `cmd /c` 时要格外注意参数引用。文件名来自用户选择的路径，建议尽量让真实处理逻辑放在 exe、py、jar、lua 中完成，减少复杂 shell 拼接。
 
-## 注意
+## 技术原理
 
-- `menu.xml`配置文件需要`utf-8`格式。
-- 调试模式下生成的日志文件是`utf-8`格式。
+### Shell 扩展流程
 
+DLL 注册为 Windows Shell 的 COM 右键菜单扩展。资源管理器加载 DLL 后，会通过 `IShellExtInit` 传入当前选中的文件列表，再通过 `IContextMenu` 请求 DLL 插入菜单项。
 
+用户点击菜单项时，Shell 调用 `InvokeCommand`。DLL 根据菜单项编号找到 `menu.xml` 中配置的 `run` 和 `arg`，替换占位符，最后用 `CreateProcessW` 启动外部工具。
 
-# 更新日志
+### 配置加载
 
-#### 2023年4月10日
+加载顺序：
 
-- 参数增加占位符：`{0}、{1}、{path}、{name}、{ext}`，具体意义见使用说明。
+1. 优先读取 DLL 同目录下的 `menu.xml`。
+2. 如果文件不存在或解析失败，使用 DLL 资源中内置的 `src/res/menu.xml`。
 
-#### 2022年8月20日
+菜单最多支持二级子菜单。更深层级会被忽略，避免资源管理器右键菜单过深影响使用体验。
 
-- 完善使用说明，优化代码。
+### 注册方式
 
-#### 2022年4月16日
+默认安装脚本使用 `regsvr32 CustomContextMenu.dll /CodeBase` 调用 DLL 的 `DllRegisterServer`。注册时会写入以下位置：
 
-- 支持更灵活的外部调用，如exe程序、python脚本、jar包、lua脚本等，可以快速集成现成工具。
+```text
+HKEY_CLASSES_ROOT\CLSID\{BD0E9CC2-1485-4077-99E2-49EEC6B4A618}
+HKEY_CLASSES_ROOT\*\shellex\ContextMenuHandlers\CustomContextMenu{BD0E9CC2-1485-4077-99E2-49EEC6B4A618}
+HKEY_CLASSES_ROOT\Directory\shellex\ContextMenuHandlers\CustomContextMenu{BD0E9CC2-1485-4077-99E2-49EEC6B4A618}
+```
 
-#### 2020年7月28日
+`doc/refer/add_menu.reg` 展示了另一种不写 Shell 扩展 DLL 的手动注册方式：直接在 `HKEY_CLASSES_ROOT\*\shell\...` 下创建普通右键菜单项，并在每个 `command` 子键中写死要执行的命令，例如：
 
-- 在 **CustomContextMenu.dll** 同目录下如果出现与菜单中 arg 同名的 Python 文件，则也会调用。例如某子菜单项的 arg 为 decodeFile，且在同目录下存在 decodeFile.py，则右键的时候会调用本地安装的 Python 执行该文件，传递的参数就是右键选中的文件路径，多文件选中时规则同前面章节。
+```reg
+[HKEY_CLASSES_ROOT\*\shell\myRightClick\shell\submenu02\command]
+@="py -3 F:\\tools\\verifyApkSign.py \"%1\""
+```
 
-#### 2020年6月1日
+这种方式简单、透明，适合少量固定菜单；缺点是菜单内容都写在注册表里，不方便按 XML 集中维护，也不适合复杂的动态菜单。`doc/refer/delete_menu.reg` 则用于删除该示例注册表分支。
 
-- 增加 **debug** 调试开关，开关打开时有日志输出且三方调用不隐藏窗口，方便排错
-- 增加 **apptype** 选项，使得响应事件的三方可以是exe、Lua脚本、Python脚本

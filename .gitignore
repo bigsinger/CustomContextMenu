@@ -6,3 +6,13 @@ NEProtectVerManager.py
 NEProtectVerManager.pyc
 .idea
 /bin/temp
+/.vs/
+/temp/
+*.pdb
+*.ilk
+*.obj
+*.tlog
+*.lastbuildstate
+src/*.user
+bin/CustomContextMenu.exp
+bin/CustomContextMenu.lib
