@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu name="安卓右键工具me" icon="icon\logo.png" run="..\..\APKInfo\APKInfo\bin\APKInfo.exe" debug="0">
-  <menu name="复制路径" icon="icon\copy.png" arg="-i {1} -c copypath"/>
+<menu name="安卓右键工具me" icon="icon\logo.png" run="..\..\..\osopen\APKInfo\APKInfo\bin\APKInfo.exe" debug="1">
+  <menu name="复制路径" icon="icon\copy.png"/>
   <menu name="记事本打开" icon="icon\notepad.png" run="notepad" arg="{1}"/>
   <menu name="文件信息" icon="icon\detect.png" arg="-i {1} -c apkinfo"/>
   <menu name="查壳" icon="icon\shield.png" arg="-i {1} -c scanshell"/>
   <menu name="DEX -> JAR" icon="icon\java.png" arg="-i {1} -c dex2jar"/>
   <menu name="Manifest修复" icon="icon\fix.png" run="script\fixAXML\main.py" arg="{1}"/>
   <menu name="Manifest ->TXT | AXML -> TXT" icon="icon\txt.png" arg="-i {1} -c axml2txt"/>
-  <menu name="aapt dump xmltree AndroidManifest" icon="icon\txt.png" run="cmd" arg="/c {0}..\..\APKInfo\APKInfo\bin\tool\aapt.exe dump xmltree -i {1} -c AndroidManifest.xml > {path}AndroidManifest.txt"/>
-  <menu name="AXML -> XML" icon="icon\txt.png" run="..\..\APKInfo\APKInfo\bin\tool\xml2axml-2.0.1.jar" arg="d -i {1} -c {path}{name}.txt"/>
-  <menu name="XML -> AXML" icon="icon\xml.png" run="..\..\APKInfo\APKInfo\bin\tool\xml2axml-2.0.1.jar" arg="e -i {1} -c {path}{name}.axml"/>
-  <menu name="jadx查看源码" icon="icon\java.png" run="..\..\APKInfo\APKInfo\bin\tool\jadx\jadx-gui-1.5.0.exe" arg="{1}"/>
-  <menu name="jd-gui查看源码" icon="icon\java.png" run="..\..\APKInfo\APKInfo\bin\tool\jdgui\jd-gui.exe" arg="{1}"/>
+  <menu name="aapt dump xmltree AndroidManifest" icon="icon\txt.png" run="cmd" arg="/c {0}..\..\..\osopen\APKInfo\APKInfo\bin\tool\aapt.exe dump xmltree -i {1} -c AndroidManifest.xml > {path}AndroidManifest.txt"/>
+  <menu name="AXML -> XML" icon="icon\txt.png" run="..\..\..\osopen\APKInfo\APKInfo\bin\tool\xml2axml-2.0.1.jar" arg="d -i {1} -c {path}{name}.txt"/>
+  <menu name="XML -> AXML" icon="icon\xml.png" run="..\..\..\osopen\APKInfo\APKInfo\bin\tool\xml2axml-2.0.1.jar" arg="e -i {1} -c {path}{name}.axml"/>
+  <menu name="jadx查看源码" icon="icon\java.png" run="..\..\..\osopen\APKInfo\APKInfo\bin\tool\jadx\jadx-gui-1.5.0.exe" arg="{1}"/>
+  <menu name="jd-gui查看源码" icon="icon\java.png" run="..\..\..\osopen\APKInfo\APKInfo\bin\tool\jdgui\jd-gui.exe" arg="{1}"/>
   <menu name="DEX信息" icon="" arg="-i {1} -c dex"/>
   <menu name="字符串资源arsc" icon="icon\strings.png" arg="-i {1} -c arsc"/>
   <menu name="SDK信息" icon="" arg="-i {1} -c sdk"/>
@@ -24,17 +24,17 @@
 	  <menu name="创建新的签名" run="keytool" arg="-genkey -v -keystore my-release-key.keystore -alias alias_name -keyalg RSA -keysize 2048 -validity 10000" icon="icon\add.png"/>
   </menu>
   <menu/>
-  <menu name="adb替换安装" icon="icon\install.png" run="..\..\APKInfo\APKInfo\bin\tool\adb\adb.exe" arg="install -r {1}"/>
-  <menu name="adb授权安装" icon="icon\install.png" run="..\..\APKInfo\APKInfo\bin\tool\adb\adb.exe" arg="install -g {1}"/>
+  <menu name="adb替换安装" icon="icon\install.png" run="..\..\..\osopen\APKInfo\APKInfo\bin\tool\adb\adb.exe" arg="install -r {1}"/>
+  <menu name="adb授权安装" icon="icon\install.png" run="..\..\..\osopen\APKInfo\APKInfo\bin\tool\adb\adb.exe" arg="install -g {1}"/>
   <menu name="安装运行（卸载安装）" icon="icon\install.png" arg="-i {1} -c installd"/>
   <menu name="卸载" icon="icon\uninstall.png" arg="-i {1} -c uninstall"/>
   <menu name="DumpScreen" icon="icon\detect.png" arg="-i {1} -c dumpscreen"/>
   <menu name="手机信息" icon="icon\phone.png" arg="-i {1} -c phone"/>
   <menu name="手机截图" icon="icon\photo.png" arg="-i {1} -c photo"/>
-  <menu name="zipalign" icon="icon\align.png" run="..\..\APKInfo\APKInfo\bin\tool\zipalign.exe" arg="-f -p 4 -i {1} -c {path}{name}_align{ext}"/>
+  <menu name="zipalign" icon="icon\align.png" run="..\..\..\osopen\APKInfo\APKInfo\bin\tool\zipalign.exe" arg="-f -p 4 -i {1} -c {path}{name}_align{ext}"/>
   <menu name="lib规范性检查" icon="icon\normalized.png" arg="-i {1} -c checklib"/>
-  <menu name="反编译baksmali" icon="icon\decom.png" run="..\..\APKInfo\APKInfo\bin\tool\smali\baksmali.jar" arg="d -i {1} -c -o {path}{name}"/>
-  <menu name="回编译smali" icon="icon\build.png" run="..\..\APKInfo\APKInfo\bin\tool\smali\smali.jar" arg="a -i {1} -c -o {path}{name}.dex"/>
+  <menu name="反编译baksmali" icon="icon\decom.png" run="..\..\..\osopen\APKInfo\APKInfo\bin\tool\smali\baksmali.jar" arg="d -i {1} -c -o {path}{name}"/>
+  <menu name="回编译smali" icon="icon\build.png" run="..\..\..\osopen\APKInfo\APKInfo\bin\tool\smali\smali.jar" arg="a -i {1} -c -o {path}{name}.dex"/>
   <menu name="深度扫描文件" icon="icon\scan.png" arg="-i {1} -c scan"/>
   <menu name="AAB -> APK" icon="icon\build.png" arg="-i {1} -c aab2apk"/>
   <menu name="生成策略报告" icon="icon\build.png" arg="-i {1} -c strategy"/>

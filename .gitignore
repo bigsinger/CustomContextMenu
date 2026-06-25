@@ -16,3 +16,4 @@ NEProtectVerManager.pyc
 src/*.user
 bin/CustomContextMenu.exp
 bin/CustomContextMenu.lib
+*/log.txt
