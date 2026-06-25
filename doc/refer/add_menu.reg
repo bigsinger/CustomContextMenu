@@ -1,0 +1,56 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\*\shell\myRightClick]
+"Icon"="imageres.dll,-5323"
+"MUIVerb"="右键工具"
+"Position"="Top"
+"SubCommands"=""
+
+
+[HKEY_CLASSES_ROOT\*\shell\myRightClick\shell\submenu01]
+"MUIVerb"="复制路径"
+
+[HKEY_CLASSES_ROOT\*\shell\myRightClick\shell\submenu02]
+"MUIVerb"="查看签名信息"
+
+[HKEY_CLASSES_ROOT\*\shell\myRightClick\shell\submenu02\command]
+@="py -3 F:\\osopen\\CustomContextMenuC\\bin\\script\\verifyApkSign.py \"%1\""
+
+
+[HKEY_CLASSES_ROOT\*\shell\myRightClick\shell\submenu03]
+"MUIVerb"="其他"
+
+[HKEY_CLASSES_ROOT\*\shell\myRightClick\shell\submenu03\command]
+@="py -3 F:\\osopen\\CustomContextMenuC\\bin\\oncommand.py tag \"%1\""
+
+[HKEY_CLASSES_ROOT\*\shell\myRightClick\shell\submenu04]
+"MUIVerb"="截图"
+
+[HKEY_CLASSES_ROOT\*\shell\myRightClick\shell\submenu04\command]
+@="\"F:\\osopen\\CustomContextMenuC\\bin\\script\\capture.bat\""
+
+
+[HKEY_CLASSES_ROOT\*\shell\myRightClick\shell\submenu12]
+"MUIVerb"="插件..."
+"SubCommands"=""
+
+[HKEY_CLASSES_ROOT\*\shell\myRightClick\shell\submenu12\shell\subsubmenu01]
+"MUIVerb"="复制路径"
+"CommandFlags"=dword:00000020
+
+[HKEY_CLASSES_ROOT\*\shell\myRightClick\shell\submenu12\shell\subsubmenu01\command]
+@="notepad.exe \"%1\""
+
+
+[HKEY_CLASSES_ROOT\*\shell\myRightClick\shell\submenu13]
+"MUIVerb"="打开源码目录"
+
+[HKEY_CLASSES_ROOT\*\shell\myRightClick\shell\submenu13\command]
+@="explorer \"F:\\osopen\\CustomContextMenuC\\bin\""
+
+
+[HKEY_CLASSES_ROOT\*\shell\myRightClick\shell\submenu14]
+"MUIVerb"="关于"
+
+[HKEY_CLASSES_ROOT\*\shell\myRightClick\shell\submenu14\command]
+@="explorer https://github.com/bigsinger"
