@@ -10,6 +10,7 @@ int g_isDebug = 0;
 typedef INT GpStatus;
 typedef struct GpBitmap GpBitmap;
 typedef struct GpImage GpImage;
+typedef struct GpGraphics GpGraphics;
 typedef struct GdiplusStartupInputC {
     UINT32 GdiplusVersion;
     void *DebugEventCallback;
@@ -17,10 +18,25 @@ typedef struct GdiplusStartupInputC {
     BOOL SuppressExternalCodecs;
 } GdiplusStartupInputC;
 
+#define GDIP_OK 0
+#define GDIP_PIXEL_FORMAT_32BPP_PARGB ((11) | (32 << 8) | 0x00040000 | 0x00080000 | 0x00020000)
+#define GDIP_INTERPOLATION_HIGH_QUALITY_BICUBIC 7
+#define GDIP_SMOOTHING_HIGH_QUALITY 2
+#define GDIP_PIXEL_OFFSET_HIGH_QUALITY 2
+
 GpStatus __stdcall GdiplusStartup(ULONG_PTR *token, const GdiplusStartupInputC *input, void *output);
 void __stdcall GdiplusShutdown(ULONG_PTR token);
 GpStatus __stdcall GdipCreateBitmapFromFile(const WCHAR *filename, GpBitmap **bitmap);
-GpStatus __stdcall GdipCreateHBITMAPFromBitmap(GpBitmap *bitmap, HBITMAP *hbmReturn, DWORD background);
+GpStatus __stdcall GdipCreateBitmapFromScan0(INT width, INT height, INT stride, INT format, BYTE *scan0, GpBitmap **bitmap);
+GpStatus __stdcall GdipGetImageGraphicsContext(GpImage *image, GpGraphics **graphics);
+GpStatus __stdcall GdipGetImageWidth(GpImage *image, UINT *width);
+GpStatus __stdcall GdipGetImageHeight(GpImage *image, UINT *height);
+GpStatus __stdcall GdipSetInterpolationMode(GpGraphics *graphics, INT interpolationMode);
+GpStatus __stdcall GdipSetSmoothingMode(GpGraphics *graphics, INT smoothingMode);
+GpStatus __stdcall GdipSetPixelOffsetMode(GpGraphics *graphics, INT pixelOffsetMode);
+GpStatus __stdcall GdipGraphicsClear(GpGraphics *graphics, DWORD color);
+GpStatus __stdcall GdipDrawImageRectI(GpGraphics *graphics, GpImage *image, INT x, INT y, INT width, INT height);
+GpStatus __stdcall GdipDeleteGraphics(GpGraphics *graphics);
 GpStatus __stdcall GdipDisposeImage(GpImage *image);
 
 static INIT_ONCE g_gdiplusOnce = INIT_ONCE_STATIC_INIT;
@@ -540,8 +556,21 @@ done:
 HBITMAP LoadMenuBitmap(LPCWSTR fileName)
 {
     DWORD attr;
-    HBITMAP bitmap;
-    GpBitmap *gpBitmap = NULL;
+    HBITMAP dib = NULL;
+    GpBitmap *source = NULL;
+    GpBitmap *target = NULL;
+    GpGraphics *graphics = NULL;
+    UINT sourceWidth = 0;
+    UINT sourceHeight = 0;
+    INT iconWidth;
+    INT iconHeight;
+    INT drawWidth;
+    INT drawHeight;
+    INT drawX;
+    INT drawY;
+    BITMAPINFO bmi;
+    void *bits = NULL;
+    BOOL rendered = FALSE;
 
     if (!fileName || !fileName[0]) {
         return NULL;
@@ -552,21 +581,87 @@ HBITMAP LoadMenuBitmap(LPCWSTR fileName)
         return NULL;
     }
 
-    bitmap = (HBITMAP)LoadImageW(NULL, fileName, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
-    if (bitmap) {
-        return bitmap;
-    }
-
     if (!EnsureGdiplus()) {
         return NULL;
     }
 
-    if (GdipCreateBitmapFromFile(fileName, &gpBitmap) == 0 && gpBitmap) {
-        GdipCreateHBITMAPFromBitmap(gpBitmap, &bitmap, 0x00FFFFFF);
-        GdipDisposeImage((GpImage *)gpBitmap);
+    if (GdipCreateBitmapFromFile(fileName, &source) != GDIP_OK || !source) {
+        return (HBITMAP)LoadImageW(NULL, fileName, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
     }
 
-    return bitmap;
+    if (GdipGetImageWidth((GpImage *)source, &sourceWidth) != GDIP_OK ||
+        GdipGetImageHeight((GpImage *)source, &sourceHeight) != GDIP_OK ||
+        sourceWidth == 0 || sourceHeight == 0) {
+        GdipDisposeImage((GpImage *)source);
+        return NULL;
+    }
+
+    iconWidth = GetSystemMetrics(SM_CXSMICON);
+    iconHeight = GetSystemMetrics(SM_CYSMICON);
+    if (iconWidth <= 0) {
+        iconWidth = 16;
+    }
+    if (iconHeight <= 0) {
+        iconHeight = 16;
+    }
+
+    if ((UINT)iconWidth * sourceHeight <= (UINT)iconHeight * sourceWidth) {
+        drawWidth = iconWidth;
+        drawHeight = (INT)((sourceHeight * (UINT)iconWidth + sourceWidth / 2) / sourceWidth);
+    } else {
+        drawHeight = iconHeight;
+        drawWidth = (INT)((sourceWidth * (UINT)iconHeight + sourceHeight / 2) / sourceHeight);
+    }
+    if (drawWidth <= 0) {
+        drawWidth = 1;
+    }
+    if (drawHeight <= 0) {
+        drawHeight = 1;
+    }
+    drawX = (iconWidth - drawWidth) / 2;
+    drawY = (iconHeight - drawHeight) / 2;
+
+    ZeroMemory(&bmi, sizeof(bmi));
+    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+    bmi.bmiHeader.biWidth = iconWidth;
+    bmi.bmiHeader.biHeight = -iconHeight;
+    bmi.bmiHeader.biPlanes = 1;
+    bmi.bmiHeader.biBitCount = 32;
+    bmi.bmiHeader.biCompression = BI_RGB;
+
+    dib = CreateDIBSection(NULL, &bmi, DIB_RGB_COLORS, &bits, NULL, 0);
+    if (!dib || !bits) {
+        if (dib) {
+            DeleteObject(dib);
+        }
+        GdipDisposeImage((GpImage *)source);
+        return NULL;
+    }
+    ZeroMemory(bits, (size_t)iconWidth * iconHeight * 4);
+
+    if (GdipCreateBitmapFromScan0(iconWidth, iconHeight, iconWidth * 4, GDIP_PIXEL_FORMAT_32BPP_PARGB, (BYTE *)bits, &target) == GDIP_OK &&
+        target &&
+        GdipGetImageGraphicsContext((GpImage *)target, &graphics) == GDIP_OK &&
+        graphics) {
+        GdipSetInterpolationMode(graphics, GDIP_INTERPOLATION_HIGH_QUALITY_BICUBIC);
+        GdipSetSmoothingMode(graphics, GDIP_SMOOTHING_HIGH_QUALITY);
+        GdipSetPixelOffsetMode(graphics, GDIP_PIXEL_OFFSET_HIGH_QUALITY);
+        GdipGraphicsClear(graphics, 0x00000000);
+        rendered = GdipDrawImageRectI(graphics, (GpImage *)source, drawX, drawY, drawWidth, drawHeight) == GDIP_OK;
+    }
+
+    if (graphics) {
+        GdipDeleteGraphics(graphics);
+    }
+    if (target) {
+        GdipDisposeImage((GpImage *)target);
+    }
+    GdipDisposeImage((GpImage *)source);
+    if (!rendered) {
+        DeleteObject(dib);
+        return NULL;
+    }
+    return dib;
 }
 
 BOOL RunCommandLine(LPCWSTR commandLine, LPCWSTR currentDir, DWORD waitMs)

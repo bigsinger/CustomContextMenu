@@ -8,8 +8,6 @@ extern HINSTANCE g_instance;
 extern LONG g_objectCount;
 
 #define XML_MAX_BYTES (1024 * 1024)
-#define MENU_START_ID_SEPARATORS 2
-
 typedef struct CommandWork {
     LPWSTR runFile;
     LPWSTR args;
@@ -663,9 +661,15 @@ static BOOL AddCommand(ShellMenuExt *object, const MenuItem *item)
 
 static void InsertMenuText(HMENU menu, UINT index, UINT flags, UINT_PTR id, LPCWSTR text, HBITMAP bitmap)
 {
+    MENUITEMINFOW itemInfo;
+
     InsertMenuW(menu, index, MF_BYPOSITION | flags, id, text && text[0] ? text : L"");
     if (bitmap) {
-        SetMenuItemBitmaps(menu, index, MF_BYPOSITION, bitmap, bitmap);
+        ZeroMemory(&itemInfo, sizeof(itemInfo));
+        itemInfo.cbSize = sizeof(itemInfo);
+        itemInfo.fMask = MIIM_BITMAP;
+        itemInfo.hbmpItem = bitmap;
+        SetMenuItemInfoW(menu, index, TRUE, &itemInfo);
     }
 }
 
@@ -726,7 +730,7 @@ static UINT CreateRootMenu(ShellMenuExt *object, HMENU menu, UINT indexMenu, UIN
     InsertMenuW(menu, indexMenu++, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
     InsertMenuText(menu, indexMenu++, MF_STRING | MF_POPUP, (UINT_PTR)popup, object->rootMenu.name, object->rootMenu.bitmap);
     InsertMenuW(menu, indexMenu++, MF_BYPOSITION | MF_SEPARATOR, 0, NULL);
-    return nextCmd + MENU_START_ID_SEPARATORS;
+    return nextCmd;
 }
 
 static void FreeCommandWork(CommandWork *work)
@@ -874,6 +878,10 @@ static HRESULT StartCommand(ShellMenuExt *object, UINT commandIndex)
 
     if (!object || commandIndex >= object->commandCount) {
         return E_INVALIDARG;
+    }
+
+    if (commandIndex == 0) {
+        return CopySelectedPaths(object) ? S_OK : E_FAIL;
     }
 
     entry = &object->commands[commandIndex];
@@ -1042,6 +1050,7 @@ static HRESULT STDMETHODCALLTYPE Context_QueryContextMenu(IContextMenu *iface, H
         return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, 0);
     }
 
+    LoadCustomMenu(object);
     used = CreateRootMenu(object, menu, indexMenu, idCmdFirst, idCmdLast);
     return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, used);
 }

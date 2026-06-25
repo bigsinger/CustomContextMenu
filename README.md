@@ -44,7 +44,7 @@ uninstall.bat
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <menu name="我的右键工具" icon="icon\logo.png" run="tools\handler.exe" debug="0">
-  <menu name="复制路径" arg="{1}"/>
+  <menu name="复制路径" icon="icon\copypath.png"/>
   <menu name="记事本打开" icon="icon\notepad.png" run="notepad" arg="{1}"/>
   <menu/>
   <menu name="图片工具" icon="icon\photo.png">
@@ -78,6 +78,8 @@ uninstall.bat
 - `{ext}`：当前选中项扩展名，包含点号。
 
 路径类占位符在常见独立参数场景下会自动加引号，能处理包含空格的路径。
+
+第一个可点击子菜单项是兼容保留功能：单选时复制完整路径，多选时复制文件列表。这个菜单项建议只配置 `name` 和 `icon`，不要依赖 `run` 或 `arg`。
 
 ### 使用场景
 
@@ -138,4 +140,3 @@ HKEY_CLASSES_ROOT\Directory\shellex\ContextMenuHandlers\CustomContextMenu{BD0E9C
 ```
 
 这种方式简单、透明，适合少量固定菜单；缺点是菜单内容都写在注册表里，不方便按 XML 集中维护，也不适合复杂的动态菜单。`doc/refer/delete_menu.reg` 则用于删除该示例注册表分支。
-
