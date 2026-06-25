@@ -877,21 +877,31 @@ static HRESULT StartCommand(ShellMenuExt *object, UINT commandIndex)
     UINT i;
 
     if (!object || commandIndex >= object->commandCount) {
+        LogMessage(L"invalid command index: %u, command count: %u", commandIndex, object ? object->commandCount : 0);
         return E_INVALIDARG;
     }
 
     if (commandIndex == 0) {
+        LogMessage(L"command 0: copy selected paths, file count: %u", object->selectedFileCount);
         return CopySelectedPaths(object) ? S_OK : E_FAIL;
     }
 
     entry = &object->commands[commandIndex];
     runSource = entry->run && entry->run[0] ? entry->run : g_defaultRunFile;
+    LogMessage(
+        L"command %u: run='%s' arg='%s' selected files=%u",
+        commandIndex,
+        runSource ? runSource : L"",
+        entry->arg ? entry->arg : L"",
+        object->selectedFileCount);
 
     if ((!runSource || !runSource[0]) && (!entry->arg || !entry->arg[0])) {
+        LogMessage(L"command %u has no run and no arg, fallback to copy selected paths", commandIndex);
         return CopySelectedPaths(object) ? S_OK : E_FAIL;
     }
 
     if (!runSource || !runSource[0] || object->selectedFileCount == 0) {
+        LogMessage(L"command %u skipped: run or selected files missing", commandIndex);
         return E_FAIL;
     }
 
@@ -1051,6 +1061,7 @@ static HRESULT STDMETHODCALLTYPE Context_QueryContextMenu(IContextMenu *iface, H
     }
 
     LoadCustomMenu(object);
+    LogMessage(L"QueryContextMenu: debug=%d defaultRun='%s' selected files=%u", g_isDebug, g_defaultRunFile, object->selectedFileCount);
     used = CreateRootMenu(object, menu, indexMenu, idCmdFirst, idCmdLast);
     return MAKE_HRESULT(SEVERITY_SUCCESS, FACILITY_NULL, used);
 }
@@ -1070,7 +1081,8 @@ static HRESULT STDMETHODCALLTYPE Context_InvokeCommand(IContextMenu *iface, LPCM
         if (HIWORD(infoEx->lpVerbW)) {
             return E_INVALIDARG;
         }
-        commandIndex = LOWORD(infoEx->lpVerbW);
+        /* Explorer keeps ordinal verbs in lpVerb even for Unicode invokes. */
+        commandIndex = LOWORD(commandInfo->lpVerb);
     } else {
         if (HIWORD(commandInfo->lpVerb)) {
             return E_INVALIDARG;
@@ -1078,6 +1090,7 @@ static HRESULT STDMETHODCALLTYPE Context_InvokeCommand(IContextMenu *iface, LPCM
         commandIndex = LOWORD(commandInfo->lpVerb);
     }
 
+    LogMessage(L"InvokeCommand index: %u", commandIndex);
     return StartCommand(object, commandIndex);
 }
 

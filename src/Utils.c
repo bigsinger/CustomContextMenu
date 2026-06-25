@@ -470,31 +470,6 @@ LPWSTR GetLaunchCommandAlloc(LPCWSTR runFile)
     return DupWide(runFile);
 }
 
-static BOOL IsTokenQuoted(LPCWSTR source, size_t pos, size_t tokenLen)
-{
-    return pos > 0 && source[pos - 1] == L'"' && source[pos + tokenLen] == L'"';
-}
-
-static BOOL IsTokenSeparated(LPCWSTR source, size_t pos, size_t tokenLen)
-{
-    WCHAR before;
-    WCHAR after;
-
-    before = pos == 0 ? L'\0' : source[pos - 1];
-    after = source[pos + tokenLen];
-
-    return (before == L'\0' || iswspace(before) || before == L'"') &&
-        (after == L'\0' || iswspace(after) || after == L'"');
-}
-
-static BOOL AppendPlaceholder(WideBuffer *buffer, LPCWSTR replacement, BOOL quote)
-{
-    if (quote) {
-        return AppendQuoted(buffer, replacement ? replacement : L"");
-    }
-    return BufferAppend(buffer, replacement ? replacement : L"");
-}
-
 LPWSTR ExpandArgumentsAlloc(LPCWSTR args, LPCWSTR filePath)
 {
     WideBuffer buffer = { 0 };
@@ -520,13 +495,13 @@ LPWSTR ExpandArgumentsAlloc(LPCWSTR args, LPCWSTR filePath)
     len = wcslen(args);
     for (i = 0; i < len && ok; ) {
         if (wcsncmp(args + i, L"{0}", 3) == 0) {
-            ok = AppendPlaceholder(&buffer, g_modulePath, !IsTokenQuoted(args, i, 3) && IsTokenSeparated(args, i, 3));
+            ok = BufferAppend(&buffer, g_modulePath);
             i += 3;
         } else if (wcsncmp(args + i, L"{1}", 3) == 0) {
-            ok = AppendPlaceholder(&buffer, filePath, !IsTokenQuoted(args, i, 3));
+            ok = BufferAppend(&buffer, filePath);
             i += 3;
         } else if (wcsncmp(args + i, L"{path}", 6) == 0) {
-            ok = AppendPlaceholder(&buffer, parent, !IsTokenQuoted(args, i, 6) && IsTokenSeparated(args, i, 6));
+            ok = BufferAppend(&buffer, parent);
             i += 6;
         } else if (wcsncmp(args + i, L"{name}", 6) == 0) {
             ok = BufferAppend(&buffer, name);
